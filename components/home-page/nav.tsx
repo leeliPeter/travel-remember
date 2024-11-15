@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import Member from "@/components/home-page/member";
 import { useRouter } from "next/navigation";
 
-export default function Nav() {
+interface NavProps {
+  isLogin: boolean;
+}
+
+export default function Nav({ isLogin }: NavProps) {
   // const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -56,22 +60,24 @@ export default function Nav() {
             </ul>
           </div>
           {/* right */}
-          <div className="hidden md:flex items-center mt-2 space-x-10">
-            <>
-              <Button
-                className="bg-white rounded-full hover:text-white text-black"
-                onClick={() => router.push("/auth/register")}
-              >
-                Sign Up
-              </Button>
-              <Button
-                className="bg-black hover:bg-white hover:text-black px-4 py-2 rounded-full text-white"
-                onClick={() => router.push("/auth/login")}
-              >
-                Login
-              </Button>
-            </>
-          </div>
+          {!isLogin && (
+            <div className="hidden md:flex items-center mt-2 space-x-10">
+              <>
+                <Button
+                  className="bg-white rounded-full hover:text-white text-black"
+                  onClick={() => router.push("/auth/register")}
+                >
+                  Sign Up
+                </Button>
+                <Button
+                  className="bg-black hover:bg-white hover:text-black px-4 py-2 rounded-full text-white"
+                  onClick={() => router.push("/auth/login")}
+                >
+                  Login
+                </Button>
+              </>
+            </div>
+          )}
         </div>
       </div>
 
