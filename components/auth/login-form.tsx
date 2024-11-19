@@ -22,10 +22,8 @@ import { login } from "@/actions/login";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const router = useRouter();
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const searchParams = useSearchParams();
   const urlError =
@@ -46,23 +44,19 @@ export default function LoginForm() {
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
-
-    const response = await login(values);
-
-    if (response?.error) {
-      setError(response.error);
-    }
-
-    if (response?.success) {
-      setSuccess(response.success);
-      if (response.redirectTo) {
-        router.push(response.redirectTo);
-      }
-    }
-
-    if (response?.twoFactor) {
-      setShowTwoFactor(true);
-    }
+    startTransition(() => {
+      login(values).then((data) => {
+        if (data?.error) {
+          setError(data.error);
+        }
+        if (data?.success) {
+          setSuccess(data.success);
+        }
+        if (data?.twoFactor) {
+          setShowTwoFactor(true);
+        }
+      });
+    });
   };
 
   return (

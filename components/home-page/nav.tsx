@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import Member from "@/components/home-page/member";
 import { useRouter } from "next/navigation";
 
 interface NavProps {
@@ -13,17 +12,9 @@ export default function Nav({ isLogin }: NavProps) {
   // const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [showMember, setShowMember] = useState<boolean>(false);
-  const [memberMode, setMemberMode] = useState<"login" | "signup">("login");
 
   const toggleMenu = (): void => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleMemberOpen = (mode: "login" | "signup") => {
-    setMemberMode(mode);
-    setShowMember(true);
-    setIsMenuOpen(false);
   };
 
   const links = [
@@ -37,9 +28,6 @@ export default function Nav({ isLogin }: NavProps) {
 
   return (
     <div className="absolute z-10 w-full top-0 left-0 right-0">
-      {showMember && (
-        <Member onClose={() => setShowMember(false)} initialMode={memberMode} />
-      )}
       <div className="container mx-auto p-6">
         <div className="flex flex-row items-center justify-between">
           {/* left */}

@@ -80,20 +80,12 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
   }
 
   try {
-    const signInResponse = await signIn("credentials", {
+    await signIn("credentials", {
       email,
       password,
-      redirect: false,
+      redirectTo: default_login_redirect,
     });
 
-    if (signInResponse?.error) {
-      return { error: "Invalid credentials" };
-    }
-
-    return {
-      success: "Logged in successfully!",
-      redirectTo: default_login_redirect,
-    };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
