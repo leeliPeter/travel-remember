@@ -10,7 +10,7 @@ import {
 } from "@/routes";
 export default auth(async (req) => {
   const { nextUrl } = req;
-  const isLogin = !!req.auth;
+  const isLogin = !!req.auth?.user;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
