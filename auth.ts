@@ -28,8 +28,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!existingUser?.emailVerified) return false;
       // TODO add email verification
       if (existingUser?.isTwoFactorEnabled) {
-        const twoFactorTokenConfirmation =
-          await getTwoFactorConfirmationByUserId(existingUser.id);
+        const twoFactorTokenConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
         if (!twoFactorTokenConfirmation) return false;
 
         // delete confirmation for next sign in
