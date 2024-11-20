@@ -3,13 +3,14 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface NavProps {
   isLogin: boolean;
 }
 
 export default function Nav({ isLogin }: NavProps) {
-  // const pathname = usePathname();
+  const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
@@ -18,13 +19,13 @@ export default function Nav({ isLogin }: NavProps) {
   };
 
   const links = [
-    { href: "/", label: "Explore" },
-    { href: "/", label: "My Trips" },
+    { href: "/explore", label: "Explore" },
+    { href: "/mytrips", label: "My Trips" },
   ];
 
-  // if (pathname.includes("/auth/login") || pathname.includes("/auth/register")) {
-  //   return null;
-  // }
+  if (pathname.includes("/auth/login") || pathname.includes("/auth/register")) {
+    return null;
+  }
 
   return (
     <div className="absolute z-10 w-full top-0 left-0 right-0">
@@ -107,12 +108,16 @@ export default function Nav({ isLogin }: NavProps) {
           ))}
         </ul>
         <div className="flex flex-col items-center space-y-8 mt-14">
-          <Button className="bg-white w-40 rounded-full hover:text-white text-black">
-            Sign Up
-          </Button>
-          <Button className="bg-black w-40 hover:bg-white hover:text-black px-4 py-2 rounded-full text-white">
-            Login
-          </Button>
+          <Link href="/auth/register">
+            <Button className="bg-white w-40 rounded-full hover:text-white text-black">
+              Sign Up
+            </Button>
+          </Link>
+          <Link href="/auth/login">
+            <Button className="bg-black w-40 hover:bg-white hover:text-black px-4 py-2 rounded-full text-white">
+              Login
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

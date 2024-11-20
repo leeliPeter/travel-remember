@@ -98,6 +98,29 @@ header > * {
   z-index: 2;
 }
 
+.trip-page {
+  background-image: url("/images/map-3.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.trip-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.5),
+    rgba(72, 72, 72, 0.5)
+  );
+  z-index: 1;
+}
+
+.trip-page > * {
+  position: relative;
+  z-index: 2;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

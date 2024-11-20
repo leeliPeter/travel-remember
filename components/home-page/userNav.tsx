@@ -16,7 +16,8 @@ export const UserNav = async () => {
   const user = await currentUser();
   return (
     <div className="absolute container ">
-      <div className=" absolute z-30 right-0 2xl:-right-40 md:top-10">
+      <div className="flex items-center gap-4  text-white absolute z-30 md:-right-0  md:top-10">
+        <div className="text-white font-semibold">{user?.email}</div>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>

@@ -2,6 +2,8 @@ import React from "react";
 import BackBtn from "./back-btn";
 import Social from "./social";
 import Header from "./header";
+import { IoMdClose } from "react-icons/io";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -25,7 +27,10 @@ export default function CardWrapper({
   showSocial,
 }: CardWrapperProps) {
   return (
-    <Card className="w-[400px] shadow-md">
+    <Card className="w-[90%] relative mx-auto sm:w-[400px] shadow-md">
+      <Link className="absolute top-4 right-4 text-xl" href="/">
+        <IoMdClose />
+      </Link>
       <CardHeader>
         <Header label={headerLabel} />
       </CardHeader>
