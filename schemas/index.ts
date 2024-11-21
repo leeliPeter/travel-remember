@@ -44,3 +44,34 @@ export const RegisterSchema = z.object({
     message: "Name is required",
   }),
 });
+
+export const TripSchema = z
+  .object({
+    name: z.string().min(1, {
+      message: "Name is required",
+    }),
+    startDate: z.date().refine(
+      (date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
+      },
+      { message: "Start date must be today or later" }
+    ),
+    endDate: z.date().refine(
+      (date) => {
+        return !isNaN(date.getTime());
+      },
+      { message: "Please enter a valid date" }
+    ),
+    description: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      return data.endDate >= data.startDate;
+    },
+    {
+      message: "End date must be the same as or after the start date",
+      path: ["endDate"],
+    }
+  );

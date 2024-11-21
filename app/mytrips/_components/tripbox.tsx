@@ -27,7 +27,7 @@ export default function Tripbox({
         {description}
       </p>
       {/* <Button className="bg-black  text-white ">Start a plan</Button> */}
-      <IoMdClose className="text-2xl absolute top-1 cursor-pointer right-3" />
+      {/* <IoMdClose className="text-2xl absolute top-1 cursor-pointer right-3" /> */}
     </div>
   );
 }
