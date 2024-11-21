@@ -15,15 +15,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { TripSchema } from "@/schemas";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { addTrip } from "@/actions/add-trip";
+import FormSuccess from "@/components/form-sucess";
+import FormError from "@/components/form-error";
 
 interface CreateTripFormProps {
-  onSubmit: (data: z.infer<typeof TripSchema>) => void;
+  onSuccess?: (trip: any) => void;
 }
 
-export function CreateTripForm({ onSubmit }: CreateTripFormProps) {
+export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof TripSchema>>({
     resolver: zodResolver(TripSchema),
@@ -35,13 +41,38 @@ export function CreateTripForm({ onSubmit }: CreateTripFormProps) {
     },
   });
 
-  const handleSubmit = (formData: z.infer<typeof TripSchema>) => {
+  const handleSubmit = async (formData: z.infer<typeof TripSchema>) => {
+    console.log("Received form data:", formData);
+    setError("");
+    setSuccess("");
+
     const data = {
       ...formData,
-      startDate: new Date(formData.startDate),
-      endDate: new Date(formData.endDate),
+      startDate:
+        formData.startDate instanceof Date
+          ? formData.startDate
+          : new Date(formData.startDate),
+      endDate:
+        formData.endDate instanceof Date
+          ? formData.endDate
+          : new Date(formData.endDate),
     };
-    onSubmit(data);
+
+    console.log("Formatted data:", data);
+
+    startTransition(async () => {
+      const response = await addTrip(data);
+      if (response?.error) {
+        setError(response.error);
+      }
+      if (response?.success) {
+        setSuccess(response.success);
+        form.reset(); // Reset form on success
+        if (response.trip && onSuccess) {
+          onSuccess(response.trip); // This will close the dialog and update the trips list
+        }
+      }
+    });
   };
 
   return (
@@ -149,14 +180,15 @@ export function CreateTripForm({ onSubmit }: CreateTripFormProps) {
               </FormItem>
             )}
           />
-
+          {success && <FormSuccess message={success} />}
+          {error && <FormError message={error} />}
           <div className="flex justify-end pt-2 sm:pt-4">
             <Button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="w-full sm:w-auto text-sm sm:text-base py-2 px-4"
             >
-              Create Trip
+              {isPending ? "Creating..." : "Create Trip"}
             </Button>
           </div>
         </form>

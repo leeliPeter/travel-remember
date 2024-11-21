@@ -23,7 +23,8 @@ export default function Nav({ isLogin }: NavProps) {
     { href: "/mytrips", label: "My Trips" },
   ];
 
-  if (pathname.includes("/auth/login") || pathname.includes("/auth/register")) {
+  // with start with /auth return null
+  if (pathname.startsWith("/auth")) {
     return null;
   }
 
@@ -33,7 +34,9 @@ export default function Nav({ isLogin }: NavProps) {
         <div className="flex flex-row items-center justify-between">
           {/* left */}
           <div className="flex flex-row items-center space-x-16">
-            <h2 className="text-4xl text-white font-bold">Travel</h2>
+            <Link href="/">
+              <h2 className="text-4xl text-white font-bold">Travel</h2>
+            </Link>
             <ul className="hidden md:flex items-center mt-6 space-x-10">
               {links.map(({ href, label }) => (
                 <li

@@ -3,8 +3,8 @@ interface Trip {
   userId: string;
   name: string;
   description: string;
-  startDate: string;
-  endDate: string;
-  createdAt: string;
-  updatedAt: string;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

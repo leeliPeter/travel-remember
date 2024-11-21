@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { TripSchema } from "@/schemas";
 import { currentUser } from "@/lib/auth";
@@ -15,13 +14,11 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
   }
 
   try {
-    // Log the incoming values
     console.log("Received values:", values);
 
     const validatedFields = TripSchema.safeParse(values);
 
     if (!validatedFields.success) {
-      // Log the specific validation errors
       console.log("Validation errors:", validatedFields.error.errors);
       return {
         error: "Invalid fields!",
@@ -31,7 +28,6 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
 
     const { name, startDate, endDate, description } = validatedFields.data;
 
-    // Log the parsed data
     console.log("Parsed data:", {
       name,
       startDate: startDate.toISOString(),
@@ -45,10 +41,18 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
         startDate,
         endDate,
         description,
-        userId: user.id,
+        users: {
+          create: {
+            userId: user.id,
+          },
+        },
       },
       include: {
-        user: true,
+        users: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
