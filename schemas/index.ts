@@ -52,11 +52,9 @@ export const TripSchema = z
     }),
     startDate: z.date().refine(
       (date) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return date >= today;
+        return !isNaN(date.getTime());
       },
-      { message: "Start date must be today or later" }
+      { message: "Please enter a valid date" }
     ),
     endDate: z.date().refine(
       (date) => {

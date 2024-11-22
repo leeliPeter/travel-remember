@@ -1,5 +1,7 @@
 import { FaUser } from "react-icons/fa";
 import { ExitIcon } from "@radix-ui/react-icons";
+import { IoPerson } from "react-icons/io5";
+import Link from "next/link";
 
 import {
   DropdownMenu,
@@ -28,6 +30,12 @@ export const UserNav = async () => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" align="end">
+            <Link href="/member">
+              <DropdownMenuItem>
+                <IoPerson className="w-4 h-4 mr-2" />
+                Profile
+              </DropdownMenuItem>
+            </Link>
             <LogoutBtn>
               <DropdownMenuItem>
                 <ExitIcon className="w-4 h-4 mr-2" />

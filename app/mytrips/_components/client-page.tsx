@@ -11,17 +11,37 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+interface Trip {
+  id: string;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+  description: string | null;
+  users: {
+    user: {
+      image: string | null;
+      name: string | null;
+    };
+  }[];
+}
+
 interface ClientTripPageProps {
-  initialTrips: any[]; // Replace 'any' with your Trip type
+  initialTrips: Trip[];
 }
 
 export default function ClientTripPage({ initialTrips }: ClientTripPageProps) {
-  const [trips, setTrips] = useState(initialTrips);
+  const [trips, setTrips] = useState<Trip[]>(initialTrips);
   const [open, setOpen] = useState(false);
 
   const handleTripCreated = (newTrip: any) => {
     setTrips((prev) => [newTrip, ...prev]);
     setOpen(false); // Close dialog after successful creation
+  };
+
+  const handleTripUpdate = (updatedTrip: Trip) => {
+    setTrips((prevTrips) =>
+      prevTrips.map((trip) => (trip.id === updatedTrip.id ? updatedTrip : trip))
+    );
   };
 
   return (
@@ -46,9 +66,10 @@ export default function ClientTripPage({ initialTrips }: ClientTripPageProps) {
               key={trip.id}
               id={trip.id}
               name={trip.name}
-              startDate={new Date(trip.startDate).toLocaleDateString()}
-              endDate={new Date(trip.endDate).toLocaleDateString()}
-              description={trip.description || ""}
+              startDate={trip.startDate}
+              endDate={trip.endDate}
+              description={trip.description}
+              onUpdate={handleTripUpdate}
               onDelete={() => {
                 setTrips((prev) => prev.filter((t) => t.id !== trip.id));
               }}
