@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Nav from "@/components/home-page/nav";
+import NavWrapper from "@/components/home-page/nav-wrapper";
 import { SessionProvider } from "next-auth/react";
-import { UserNav } from "@/components/home-page/userNav";
 import { auth } from "@/auth";
 
 export const metadata: Metadata = {
@@ -16,17 +15,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+
   return (
     <SessionProvider session={session}>
       <html lang="en">
         <body>
-          <div className="relative ">
-            <Nav isLogin={session ? true : false} />
-            {session && (
-              <div className="hidden md:block">
-                <UserNav />
-              </div>
-            )}
+          <div className="relative">
+            <NavWrapper />
             {children}
           </div>
         </body>
