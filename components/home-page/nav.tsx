@@ -45,7 +45,7 @@ export default function Nav({ user }: NavProps) {
   ];
 
   // with start with /auth return null
-  if (pathname.startsWith("/auth")) {
+  if (pathname.startsWith("/auth") || pathname.startsWith("/member")) {
     return null;
   }
 
