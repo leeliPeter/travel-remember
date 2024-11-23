@@ -1,5 +1,15 @@
 import * as z from "zod";
 
+export const UpdateUserInfoSchema = z.object({
+  name: z.optional(
+    z.string().min(1, { message: "Name is required" }).max(20, {
+      message: "Name can not be longer than 20 characters",
+    })
+  ),
+  isTwoFactorEnabled: z.optional(z.boolean()),
+  email: z.optional(z.string().email({ message: "Invalid email address" })),
+});
+
 export const NewPasswordSchema = z.object({
   //include length and at least one letter and one number
   password: z
