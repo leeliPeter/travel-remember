@@ -138,7 +138,7 @@ export function MemberPage({ user }: MemberPageProps) {
   };
 
   return (
-    <div className="container mx-auto   ">
+    <div className=" mx-auto h-screen w-screen member-page flex items-center justify-center">
       <Card className="sm:max-w-[600px] w-[90vw]  sm:h-auto  relative     mx-auto">
         <IoMdClose
           className="absolute top-4 right-4 text-2xl cursor-pointer"

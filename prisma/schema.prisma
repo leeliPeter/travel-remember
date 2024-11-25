@@ -94,6 +94,34 @@ model Trip {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   users       UserTrip[]
+  lists       List[]    // One trip can have many lists
+}
+
+model List {
+  id          String     @id @default(cuid())
+  name        String
+  tripId      String
+  trip        Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  locations   Location[] // One list can have many locations
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([tripId])
+}
+
+model Location {
+  id          String    @id @default(cuid())
+  name        String
+  address     String
+  lat         Float
+  lng         Float
+  photoUrl    String?
+  listId      String
+  list        List      @relation(fields: [listId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([listId])
 }
 
 model UserTrip {
