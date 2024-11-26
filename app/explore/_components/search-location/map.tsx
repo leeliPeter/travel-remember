@@ -496,8 +496,63 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
   }, [lists]);
 
   if (!isBrowser) return null;
-  if (loadError) return <div>Error loading maps</div>;
-  if (!isLoaded) return <div>Loading...</div>;
+  if (loadError)
+    return (
+      <div className="h-full flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-3">
+          <svg
+            className="w-10 h-10 text-red-500 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <div className="text-lg font-medium text-gray-900">
+            Error loading maps
+          </div>
+          <div className="text-sm text-gray-500">
+            Please check your internet connection and try again
+          </div>
+        </div>
+      </div>
+    );
+  if (!isLoaded)
+    return (
+      <div className="h-full flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-3">
+          <div className="relative w-16 h-16 mx-auto">
+            {/* Outer circle */}
+            <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-200 rounded-full"></div>
+            {/* Spinning circle */}
+            <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+          </div>
+          <div className="text-lg font-medium text-gray-900">Loading Maps</div>
+          <div className="text-sm text-gray-500">
+            Please wait while we load Google Maps
+          </div>
+          <div className="flex justify-center space-x-1">
+            <div
+              className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+              style={{ animationDelay: "0s" }}
+            ></div>
+            <div
+              className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
+            <div
+              className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+              style={{ animationDelay: "0.4s" }}
+            ></div>
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <div className="relative h-full">
@@ -516,7 +571,7 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
           />
           <button
             onClick={handleSearch}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-1 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -524,7 +579,7 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-5 h-5"
+              className="w-4 h-4"
             >
               <path
                 strokeLinecap="round"
