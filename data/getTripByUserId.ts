@@ -16,6 +16,11 @@ export const getTripsByUserId = async (userId: string) => {
             user: true,
           },
         },
+        lists: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",

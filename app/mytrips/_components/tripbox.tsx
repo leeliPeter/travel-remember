@@ -18,6 +18,7 @@ import { FaUser } from "react-icons/fa";
 import { getTripUsersImages } from "@/data/getTripUsersImages";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { AdjustTripForm } from "./adjust-trip-form";
+import Link from "next/link";
 
 interface TripboxProps {
   id: string;
@@ -142,7 +143,9 @@ export default function Tripbox({
             />
           </DialogContent>
         </Dialog>
-        <Button className="w-20">Plan</Button>
+        <Link href={`/explore?view=search&tripId=${id}`}>
+          <Button className="w-20">Plan</Button>
+        </Link>
       </div>
 
       <AlertDialog>

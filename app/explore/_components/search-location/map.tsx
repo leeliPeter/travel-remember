@@ -1,6 +1,9 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { CustomInfoWindow } from "./custom-info-window";
+import { addLocationToList } from "@/actions/list-add-location";
+import { toast } from "sonner";
+import { List } from "@/types";
 
 interface LocationInfo {
   id: string;
@@ -16,13 +19,17 @@ interface SearchResult {
   description: string;
 }
 
-export default function Map() {
+interface MapProps {
+  lists: List[];
+  onListUpdate: () => Promise<void>;
+}
+
+export default function Map({ lists, onListUpdate }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<LocationInfo | null>(
     null
   );
-  const [savedLocations, setSavedLocations] = useState<LocationInfo[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
@@ -115,25 +122,29 @@ export default function Map() {
     };
   }, []);
 
-  // Add location to saved list
-  const handleSaveLocation = (location: LocationInfo) => {
-    setSavedLocations((prev) => {
-      // Check if location is already saved
-      if (prev.some((loc) => loc.id === location.id)) {
-        return prev;
+  const handleSaveLocation = async (location: LocationInfo, listId: string) => {
+    try {
+      const result = await addLocationToList(listId, {
+        name: location.name,
+        address: location.address,
+        lat: location.lat,
+        lng: location.lng,
+        photoUrl: location.photoUrl,
+      });
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
       }
-      return [...prev, location];
-    });
-  };
 
-  // Remove location from saved list
-  const handleRemoveLocation = (locationId: string) => {
-    setSavedLocations((prev) => prev.filter((loc) => loc.id !== locationId));
-  };
-
-  // Check if location is saved
-  const isLocationSaved = (locationId: string) => {
-    return savedLocations.some((loc) => loc.id === locationId);
+      if (result.success) {
+        toast.success(result.success);
+        await onListUpdate(); // Refresh lists after successful addition
+        setSelectedLocation(null); // Close info window
+      }
+    } catch (error) {
+      toast.error("Failed to add location to list");
+    }
   };
 
   // Handle search input
@@ -219,52 +230,19 @@ export default function Map() {
         </div>
       </div>
 
-      {/* Saved Locations List */}
-      {savedLocations.length > 0 && (
-        <div className="absolute top-4 right-4 z-50 bg-white rounded-lg shadow-xl border border-gray-200 w-[300px] max-h-[500px] overflow-y-auto">
-          <div className="p-4 border-b border-gray-200">
-            <h3 className="font-semibold">
-              Saved Locations ({savedLocations.length})
-            </h3>
-          </div>
-          <div className="p-2">
-            {savedLocations.map((location) => (
-              <div
-                key={location.id}
-                className="p-2 hover:bg-gray-50 rounded-md"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium text-sm">{location.name}</p>
-                    <p className="text-xs text-gray-500">{location.address}</p>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveLocation(location.id)}
-                    className="text-red-500 hover:text-red-600 text-xs"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Map Container */}
       <div className="relative h-full w-full">
         {/* Map */}
         <div ref={mapRef} className="h-full w-full rounded-lg shadow-lg" />
 
-        {/* Info Window - Positioned at bottom left of map */}
+        {/* Info Window */}
         {selectedLocation && (
           <div className="absolute bottom-8 left-8 z-50">
             <CustomInfoWindow
               location={selectedLocation}
               onClose={() => setSelectedLocation(null)}
               onSave={handleSaveLocation}
-              onRemove={handleRemoveLocation}
-              isSaved={isLocationSaved(selectedLocation.id)}
+              lists={lists}
             />
           </div>
         )}
