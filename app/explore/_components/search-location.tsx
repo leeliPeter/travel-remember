@@ -9,6 +9,20 @@ import { getTrip } from "@/actions/get-trip";
 import { getListsByTripId } from "@/data/get-lists-by-tripId";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
+import { deleteList } from "@/actions/delete-list";
+import { IoMdClose } from "react-icons/io";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { deleteLocation } from "@/actions/del-location";
 
 interface Location {
   id: string;
@@ -39,11 +53,16 @@ interface TripInfo {
   description: string | null;
 }
 
+// interface ListWithLocations extends List {
+//   locations: Location[];
+// }
+
 export default function SearchLocation() {
   const [listName, setListName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [tripInfo, setTripInfo] = useState<TripInfo | null>(null);
   const [lists, setLists] = useState<List[]>([]);
+  const [selectedList, setSelectedList] = useState<List | null>(null);
   const searchParams = useSearchParams();
   const tripId = searchParams.get("tripId");
 
@@ -51,6 +70,7 @@ export default function SearchLocation() {
     if (!tripId) return;
     try {
       const result = await getListsByTripId(tripId);
+      console.log("Lists fetched:", result);
 
       if (result.error) {
         toast.error(result.error);
@@ -58,6 +78,7 @@ export default function SearchLocation() {
       }
 
       if (result.lists) {
+        console.log("Setting lists:", result.lists);
         setLists(result.lists);
       }
     } catch (error) {
@@ -124,11 +145,80 @@ export default function SearchLocation() {
     }
   };
 
+  const handleListClick = (list: List) => {
+    setSelectedList(selectedList?.id === list.id ? null : list);
+  };
+
+  const handleDeleteList = async (listId: string) => {
+    try {
+      const result = await deleteList(listId);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      if (result.success) {
+        toast.success(result.success);
+        setLists((currentLists) =>
+          currentLists.filter((list) => list.id !== listId)
+        );
+        if (selectedList?.id === listId) {
+          setSelectedList(null);
+        }
+      }
+    } catch (error) {
+      toast.error("Failed to delete list");
+    }
+  };
+
+  const handleLocationAdded = (listId: string, newLocation: Location) => {
+    setLists((currentLists) =>
+      currentLists.map((list) =>
+        list.id === listId
+          ? {
+              ...list,
+              locations: [newLocation, ...list.locations],
+            }
+          : list
+      )
+    );
+  };
+
+  const handleDeleteLocation = async (locationId: string, listId: string) => {
+    try {
+      const result = await deleteLocation(locationId);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      if (result.success) {
+        toast.success(result.success);
+        setLists((currentLists) =>
+          currentLists.map((list) =>
+            list.id === listId
+              ? {
+                  ...list,
+                  locations: list.locations.filter(
+                    (loc) => loc.id !== locationId
+                  ),
+                }
+              : list
+          )
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to delete location");
+    }
+  };
+
   return (
-    <div className="flex space-y-4 md:space-y-0 md:space-x-4 flex-col md:flex-row h-[80vh]">
-      <div className="box1 w-full md:w-1/4 bg-white/20 flex-col flex p-2 space-y-3 rounded-lg">
+    <div className="flex space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-col md:flex-row h-[80vh]">
+      <div className="box1 w-full md:w-1/4  flex-col flex    ">
         {tripInfo && (
-          <div className="w-full bg-white rounded-lg flex justify-center py-3 space-y-2 flex-col items-center">
+          <div className="w-full bg-white  flex justify-center py-3 space-y-2 flex-col items-center">
             <p className="text-xl font-bold w-[80%] text-center truncate capitalize">
               {tripInfo.name}
             </p>
@@ -146,28 +236,102 @@ export default function SearchLocation() {
             </p>
           </div>
         )}
-        <div className="w-full bg-gray-200 rounded-lg h-full flex-col flex px-3 py-3 items-center">
+        <div className="w-full bg-gray-200 h-full flex-col flex px-3 py-3 items-center">
           {/* Lists Section */}
-          <div className="w-full mb-4">
+          <div className="w-full overflow-y-auto flex-1 mb-4">
             <div className="text-xl font-bold pb-2">Lists</div>
             {lists.length > 0 ? (
-              <div className="space-y-2 max-h-[200px] overflow-y-auto">
+              <div className="space-y-2">
                 {lists.map((list) => (
-                  <div
-                    key={list.id}
-                    className="bg-white rounded-lg p-3 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">{list.name}</span>
-                      <span className="text-xs text-gray-500">
-                        {list.locations.length} locations
-                      </span>
+                  <div key={list.id} className="flex flex-col">
+                    <div
+                      className="bg-white rounded-lg p-3 hover:bg-gray-50 transition-colors group cursor-pointer sticky top-0 z-10 shadow-sm"
+                      onClick={() => handleListClick(list)}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm md:text-base font-medium truncate pr-8">
+                          {list.name}
+                        </span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs md:text-sm text-gray-500">
+                            {list.locations.length} locations
+                          </span>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <IoMdClose className="h-5 w-5" />
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete List</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{list.name}"?
+                                  This action cannot be undone. All locations in
+                                  this list will also be deleted.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteList(list.id);
+                                  }}
+                                  className="bg-red-500 hover:bg-red-600"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Locations Display */}
+                    {selectedList?.id === list.id &&
+                      list.locations.length > 0 && (
+                        <div className="mt-2 ml-4 space-y-2 overflow-y-auto h-40">
+                          {list.locations.map((location) => (
+                            <div
+                              key={location.id}
+                              className="bg-gray-50 rounded-lg p-2 text-sm relative group"
+                            >
+                              <button
+                                onClick={() =>
+                                  handleDeleteLocation(location.id, list.id)
+                                }
+                                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                              >
+                                <IoMdClose className="h-4 w-4" />
+                              </button>
+                              <div className="font-medium text-blue-600 pr-6">
+                                {location.name}
+                              </div>
+                              {location.photoUrl && (
+                                <img
+                                  src={location.photoUrl}
+                                  alt={location.name}
+                                  className="w-full h-24 object-cover rounded-md mt-2"
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-gray-500 text-center py-2">
+              <div className="text-center text-gray-500 text-sm py-2">
                 No lists created yet
               </div>
             )}
@@ -199,7 +363,11 @@ export default function SearchLocation() {
         </div>
       </div>
       <div className="box2 w-full h-full md:w-3/4 bg-white rounded-lg">
-        <Map lists={lists} onListUpdate={fetchLists} />
+        <Map
+          lists={lists}
+          onLocationAdded={handleLocationAdded}
+          key={lists.length}
+        />
       </div>
     </div>
   );

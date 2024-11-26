@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 export const getListsByTripId = async (tripId: string) => {
   try {
     const session = await auth();
+    console.log("Session:", session);
 
     if (!session?.user?.id) {
       return { error: "Unauthorized" };
@@ -33,6 +34,8 @@ export const getListsByTripId = async (tripId: string) => {
         createdAt: "desc",
       },
     });
+
+    console.log("Lists found:", lists);
 
     return { success: true, lists };
   } catch (error) {

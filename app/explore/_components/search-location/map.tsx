@@ -1,252 +1,558 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { CustomInfoWindow } from "./custom-info-window";
-import { addLocationToList } from "@/actions/list-add-location";
-import { toast } from "sonner";
-import { List } from "@/types";
 
-interface LocationInfo {
-  id: string;
+import { useLoadScript, GoogleMap } from "@react-google-maps/api";
+import { useState, useEffect, useRef } from "react";
+import { addLocation } from "@/actions/add-location";
+import { toast } from "sonner";
+import { List, Location } from "@prisma/client";
+
+const containerStyle = {
+  width: "100%",
+  height: "100%",
+};
+
+const defaultCenter = {
+  lat: 25.033,
+  lng: 121.5654,
+};
+
+const libraries: "places"[] = ["places"];
+
+interface PlaceInfo {
   name: string;
   address: string;
-  lat: number;
-  lng: number;
-  photoUrl?: string;
+  position: google.maps.LatLngLiteral;
+  placeId?: string;
 }
 
-interface SearchResult {
-  place_id: string;
-  description: string;
+interface MapClickEvent extends google.maps.MapMouseEvent {
+  placeId?: string;
+}
+
+interface ListWithLocations extends List {
+  locations: Location[];
 }
 
 interface MapProps {
-  lists: List[];
-  onListUpdate: () => Promise<void>;
+  lists: ListWithLocations[];
+  onLocationAdded: (listId: string, newLocation: Location) => void;
 }
 
-export default function Map({ lists, onListUpdate }: MapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
+export default function Map({ lists, onLocationAdded }: MapProps) {
+  console.log("Lists received in Map:", lists);
+
+  const [isBrowser, setIsBrowser] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceInfo | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<LocationInfo | null>(
-    null
-  );
-  const [searchValue, setSearchValue] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-
-  const getPlaceDetails = async (placeId: string, map: google.maps.Map) => {
-    const placesService = new google.maps.places.PlacesService(map);
-
-    return new Promise((resolve, reject) => {
-      placesService.getDetails(
-        {
-          placeId: placeId,
-          fields: ["name", "formatted_address", "photos", "geometry"],
-        },
-        (place, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-            const photoUrl = place.photos?.[0]?.getUrl({
-              maxWidth: 800,
-              maxHeight: 600,
-            });
-
-            const locationInfo: LocationInfo = {
-              id: placeId,
-              name: place.name || "",
-              address: place.formatted_address || "",
-              lat: place.geometry?.location?.lat() || 0,
-              lng: place.geometry?.location?.lng() || 0,
-              photoUrl,
-            };
-            resolve(locationInfo);
-          } else {
-            reject(new Error("Failed to fetch place details"));
-          }
-        }
-      );
-    });
-  };
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchBoxRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const [isAddingLocation, setIsAddingLocation] = useState(false);
+  const currentPlaceRef = useRef<google.maps.places.PlaceResult | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const loadMap = async () => {
-      if (!mapRef.current) return;
-
-      try {
-        const map = new google.maps.Map(mapRef.current, {
-          center: { lat: 25.0374, lng: 121.5388 },
-          zoom: 15,
-          mapTypeControl: false,
-          streetViewControl: true,
-          zoomControl: true,
-          mapTypeId: "roadmap",
-          clickableIcons: false,
-        });
-
-        map.addListener("click", async (event: google.maps.MapMouseEvent) => {
-          const clickedLocation = event.latLng;
-          if (!clickedLocation) return;
-
-          try {
-            const geocoder = new google.maps.Geocoder();
-            const geoResponse = await geocoder.geocode({
-              location: clickedLocation,
-            });
-
-            if (geoResponse.results[0]) {
-              const locationInfo = await getPlaceDetails(
-                geoResponse.results[0].place_id,
-                map
-              );
-              setSelectedLocation(locationInfo as LocationInfo);
-            }
-          } catch (error) {
-            console.error("Error fetching place details:", error);
-          }
-        });
-
-        setMap(map);
-      } catch (error) {
-        console.error("Map initialization error:", error);
-      }
-    };
-
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.onload = loadMap;
-    document.head.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
+    setIsBrowser(true);
   }, []);
 
-  const handleSaveLocation = async (location: LocationInfo, listId: string) => {
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+    libraries,
+  });
+
+  const createInfoWindowContent = (place: google.maps.places.PlaceResult) => {
+    const photoUrl = place.photos?.[0]?.getUrl();
+
+    return `
+      <div class="p-4 max-w-[300px]">
+        <div class="flex flex-col space-y-4">
+          <div class="relative w-full" id="dropdownContainer">
+            <button
+              id="addToListBtn"
+              class="w-full px-4 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Add to List
+            </button>
+            
+            <div id="listSelectContainer" class="hidden absolute top-full left-0 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+              ${
+                lists.length > 0
+                  ? `<div class="py-1">
+                      ${lists
+                        .map(
+                          (list) => `
+                        <button
+                          class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex justify-between items-center group"
+                          data-list-id="${list.id}"
+                        >
+                          <span class="font-medium">${list.name}</span>
+                          <span class="text-gray-400 text-xs">${list.locations.length} locations</span>
+                        </button>
+                      `
+                        )
+                        .join("")}
+                    </div>`
+                  : `<div class="px-4 py-2 text-sm text-gray-500">No lists available</div>`
+              }
+            </div>
+          </div>
+
+          ${
+            photoUrl
+              ? `<div class="mb-2">
+                  <img 
+                    src="${photoUrl}" 
+                    alt="${place.name || ""}"
+                    class="w-full h-48 object-cover rounded-lg"
+                  />
+                </div>`
+              : ""
+          }
+          
+          <div class="text-lg font-bold text-blue-500">
+            ${place.name || ""}
+          </div>
+          
+          <div class="text-sm text-gray-600">
+            ${place.formatted_address || ""}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  const handleAddToList = async (
+    listId: string,
+    place: google.maps.places.PlaceResult
+  ) => {
+    if (!place.geometry?.location || isAddingLocation) return;
+
+    setIsAddingLocation(true);
     try {
-      const result = await addLocationToList(listId, {
-        name: location.name,
-        address: location.address,
-        lat: location.lat,
-        lng: location.lng,
-        photoUrl: location.photoUrl,
-      });
+      const locationData = {
+        name: place.name || "",
+        address: place.formatted_address || "",
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
+        photoUrl: place.photos?.[0]?.getUrl() || null,
+        listId: listId,
+      };
+
+      const result = await addLocation(locationData);
 
       if (result.error) {
         toast.error(result.error);
-        return;
-      }
-
-      if (result.success) {
+      } else if (result.success && result.location) {
         toast.success(result.success);
-        await onListUpdate(); // Refresh lists after successful addition
-        setSelectedLocation(null); // Close info window
+        onLocationAdded(listId, result.location);
+        if (infoWindowRef.current) {
+          infoWindowRef.current.close();
+        }
       }
     } catch (error) {
-      toast.error("Failed to add location to list");
+      toast.error("Failed to add location");
+    } finally {
+      setIsAddingLocation(false);
     }
   };
 
-  // Handle search input
-  useEffect(() => {
-    if (!map || !searchValue || searchValue.length < 2) {
-      setSearchResults([]);
-      return;
-    }
+  const setupInfoWindowListeners = (place: google.maps.places.PlaceResult) => {
+    const addButton = document.getElementById("addToListBtn");
+    const listSelectContainer = document.getElementById("listSelectContainer");
+    const dropdownContainer = document.getElementById("dropdownContainer");
 
-    const searchPlaces = async () => {
-      try {
-        const service = new google.maps.places.AutocompleteService();
-        const response = await service.getPlacePredictions({
-          input: searchValue,
-          componentRestrictions: { country: "tw" },
-          types: ["establishment", "geocode"],
-        });
-        setSearchResults(response?.predictions || []);
-      } catch (error) {
-        console.error("Search error:", error);
-        setSearchResults([]);
-      }
-    };
+    if (addButton && listSelectContainer && dropdownContainer) {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          dropdownContainer &&
+          !dropdownContainer.contains(event.target as Node)
+        ) {
+          listSelectContainer.classList.add("hidden");
+        }
+      };
 
-    const timeoutId = setTimeout(searchPlaces, 300);
-    return () => clearTimeout(timeoutId);
-  }, [searchValue, map]);
-
-  // Handle search result selection
-  const handleSearchSelect = async (placeId: string) => {
-    if (!map) return;
-
-    try {
-      const locationInfo = (await getPlaceDetails(
-        placeId,
-        map
-      )) as LocationInfo;
-      setSelectedLocation(locationInfo);
-      setSearchResults([]); // Clear search results
-      setSearchValue(""); // Clear search input
-
-      // Center map on selected location
-      map.setCenter({
-        lat: locationInfo.lat,
-        lng: locationInfo.lng,
+      // Toggle dropdown
+      addButton.addEventListener("click", () => {
+        if (!isAddingLocation) {
+          listSelectContainer.classList.toggle("hidden");
+        }
       });
-      map.setZoom(17);
-    } catch (error) {
-      console.error("Error selecting place:", error);
+
+      // Add click handlers for list items
+      const listButtons =
+        listSelectContainer.querySelectorAll("[data-list-id]");
+      listButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const listId = button.getAttribute("data-list-id");
+          if (listId) {
+            handleAddToList(listId, place);
+            listSelectContainer.classList.add("hidden");
+          }
+        });
+      });
+
+      // Add click outside listener
+      document.addEventListener("click", handleClickOutside);
+
+      // Clean up function
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
+      };
     }
   };
+
+  const handlePlaceSelect = (placeId: string, map: google.maps.Map) => {
+    const service = new google.maps.places.PlacesService(map);
+    service.getDetails(
+      {
+        placeId: placeId,
+        fields: [
+          "name",
+          "formatted_address",
+          "geometry",
+          "place_id",
+          "photos",
+          "rating",
+          "user_ratings_total",
+          "opening_hours",
+        ],
+      },
+      (place, status) => {
+        if (
+          status === google.maps.places.PlacesServiceStatus.OK &&
+          place &&
+          place.geometry &&
+          place.geometry.location
+        ) {
+          currentPlaceRef.current = place;
+          console.log("Creating InfoWindow with lists:", lists);
+
+          const content = document.createElement("div");
+          content.className = "custom-info-window";
+          const photoUrl = place.photos?.[0]?.getUrl({
+            maxWidth: 260,
+            maxHeight: 180,
+          });
+
+          content.innerHTML = `
+            <div class="p-0 min-w-[170px] max-w-[260px]">
+              <div class="flex flex-col space-y-2">
+                <div class="relative h-[34px] w-[85%]" id="dropdownContainer">
+                  <button
+                    id="addToListBtn"
+                    class="w-full px-4 absolute top-2 left-0 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center gap-2"
+                  >
+       
+                    Add to List
+                  </button>
+                  
+                  <div id="listSelectContainer" class="hidden absolute top-full left-0 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-[9999]">
+                    <div class="py-1">
+                      ${
+                        lists.length > 0
+                          ? lists
+                              .map(
+                                (list) => `
+                                <button
+                                  class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex justify-between items-center group"
+                                  data-list-id="${list.id}"
+                                >
+                                  <span class="font-medium">${list.name}</span>
+                                  <span class="text-gray-400 text-xs">${list.locations.length} locations</span>
+                                </button>
+                              `
+                              )
+                              .join("")
+                          : `<div class="px-4 py-2 text-sm text-gray-500">No lists available</div>`
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                ${
+                  photoUrl
+                    ? `<div class="mb-2">
+                        <img 
+                          src="${photoUrl}" 
+                          alt="${place.name || ""}"
+                          class="w-full h-48 object-cover rounded-lg"
+                        />
+                      </div>`
+                    : ""
+                }
+                
+                <div class="text-sm font-bold text-blue-500">
+                  ${place.name || ""}
+                </div>
+                
+                ${
+                  place.rating
+                    ? `<div class="mb-2">
+                        <div class="text-yellow-500 text-sm">
+                          ${"★".repeat(Math.floor(place.rating))}${
+                        place.rating % 1 >= 0.5 ? "½" : ""
+                      }${"☆".repeat(5 - Math.ceil(place.rating))}
+                        </div>
+                        <div class="text-gray-600 text-sm">
+                          ${place.rating} (${place.user_ratings_total} reviews)
+                        </div>
+                      </div>`
+                    : ""
+                }
+                
+                ${
+                  place.opening_hours
+                    ? `<div class="mb-3">
+                        <div class="mb-1 text-sm">
+                          ${
+                            place.opening_hours.isOpen()
+                              ? '<span class="text-green-600 font-medium">Open now</span>'
+                              : '<span class="text-red-600 font-medium">Closed now</span>'
+                          }
+                        </div>
+                        <div class="text-xs text-gray-600">
+                          ${place.opening_hours.weekday_text
+                            ?.map((day) => `<div>${day}</div>`)
+                            .join("")}
+                        </div>
+                      </div>`
+                    : ""
+                }
+
+                <div>
+                  <a
+                    href="https://maps.google.com/maps?ll=${place.geometry.location.lat()},${place.geometry.location.lng()}&z=21&t=m&hl=en-US&gl=US&mapclient=apiv3${
+            place.place_id ? `&cid=${place.place_id}` : ""
+          }"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-blue-500 hover:text-blue-700 text-sm"
+                  >
+                    View on Google Maps
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+
+          if (infoWindowRef.current) {
+            infoWindowRef.current.close();
+          }
+
+          const infoWindow = new google.maps.InfoWindow({
+            content,
+            position: place.geometry.location,
+          });
+
+          infoWindowRef.current = infoWindow;
+          infoWindow.open(map);
+
+          // Add event listeners after InfoWindow is opened
+          google.maps.event.addListenerOnce(infoWindow, "domready", () => {
+            const addButton = document.getElementById("addToListBtn");
+            const listSelectContainer = document.getElementById(
+              "listSelectContainer"
+            );
+            const dropdownContainer =
+              document.getElementById("dropdownContainer");
+
+            if (addButton && listSelectContainer && dropdownContainer) {
+              // Toggle dropdown
+              addButton.addEventListener("click", (e) => {
+                e.stopPropagation();
+                listSelectContainer.classList.toggle("hidden");
+              });
+
+              // Add click handlers for list items
+              const listButtons =
+                listSelectContainer.querySelectorAll("[data-list-id]");
+              listButtons.forEach((button) => {
+                button.addEventListener("click", (e) => {
+                  e.stopPropagation();
+                  const listId = button.getAttribute("data-list-id");
+                  if (listId && currentPlaceRef.current) {
+                    handleAddToList(listId, currentPlaceRef.current);
+                    listSelectContainer.classList.add("hidden");
+                  }
+                });
+              });
+
+              // Close dropdown when clicking outside
+              document.addEventListener("click", (e) => {
+                if (!dropdownContainer.contains(e.target as Node)) {
+                  listSelectContainer.classList.add("hidden");
+                }
+              });
+            }
+          });
+        }
+      }
+    );
+  };
+
+  const handleMapLoad = (map: google.maps.Map) => {
+    setMap(map);
+
+    if (map) {
+      map.addListener("click", (event: MapClickEvent) => {
+        event.stop?.();
+
+        const placeId = event.placeId;
+        if (!placeId) {
+          if (infoWindowRef.current) {
+            infoWindowRef.current.close();
+          }
+          setSelectedPlace(null);
+          return;
+        }
+
+        handlePlaceSelect(placeId, map);
+      });
+    }
+  };
+
+  const handleSearch = () => {
+    if (
+      searchInputRef.current &&
+      searchInputRef.current.value.trim() !== "" &&
+      map
+    ) {
+      const service = new google.maps.places.PlacesService(map);
+      const searchQuery = searchInputRef.current.value;
+
+      const request = {
+        query: searchQuery,
+        fields: ["place_id", "geometry", "name"],
+      };
+
+      service.findPlaceFromQuery(request, (results, status) => {
+        if (
+          status === google.maps.places.PlacesServiceStatus.OK &&
+          results &&
+          results[0] &&
+          results[0].place_id
+        ) {
+          const firstResult = results[0];
+
+          if (firstResult.geometry?.location) {
+            // Center map on the first result
+            map.setCenter(firstResult.geometry.location);
+            map.setZoom(17);
+
+            // Show place details in InfoWindow
+            handlePlaceSelect(firstResult.place_id!, map);
+          }
+
+          // Clear the search input
+          searchInputRef.current!.value = "";
+        }
+      });
+    }
+  };
+
+  // Initialize search box
+  useEffect(() => {
+    if (isLoaded && searchInputRef.current && map) {
+      const autocomplete = new google.maps.places.Autocomplete(
+        searchInputRef.current,
+        {
+          fields: ["place_id", "geometry", "name"],
+        }
+      );
+
+      autocomplete.bindTo("bounds", map);
+
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+
+        if (!place.geometry || !place.geometry.location || !place.place_id) {
+          return;
+        }
+
+        map.setCenter(place.geometry.location);
+        map.setZoom(17);
+
+        handlePlaceSelect(place.place_id, map);
+
+        if (searchInputRef.current) {
+          searchInputRef.current.value = "";
+        }
+      });
+
+      searchBoxRef.current = autocomplete;
+    }
+  }, [isLoaded, map]);
+
+  // Add useEffect to watch for lists changes
+  useEffect(() => {
+    console.log("Lists updated in Map:", lists);
+    // If there's an open InfoWindow, update its content
+    if (infoWindowRef.current && currentPlaceRef.current) {
+      handlePlaceSelect(currentPlaceRef.current.place_id!, map!);
+    }
+  }, [lists]);
+
+  if (!isBrowser) return null;
+  if (loadError) return <div>Error loading maps</div>;
+  if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <div className="relative h-full">
-      {/* Search Bar */}
-      <div className="absolute top-4 left-4 z-50 w-[350px]">
-        <div className="relative">
+      <div className="absolute top-4 left-4 z-10 w-80">
+        <div className="flex gap-2">
           <input
+            ref={searchInputRef}
             type="text"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search locations in Taiwan..."
-            className="w-full p-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Search places..."
+            className="w-full px-4 py-2 rounded-lg shadow-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            🔍
-          </span>
-
-          {/* Search Results Dropdown */}
-          {searchResults.length > 0 && (
-            <div className="absolute w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-[300px] overflow-y-auto">
-              {searchResults.map((result: SearchResult) => (
-                <button
-                  key={result.place_id}
-                  onClick={() => handleSearchSelect(result.place_id)}
-                  className="w-full p-3 text-left hover:bg-gray-100 border-b border-gray-200 last:border-b-0"
-                >
-                  <p className="text-sm">{result.description}</p>
-                </button>
-              ))}
-            </div>
-          )}
+          <button
+            onClick={handleSearch}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
-
-      {/* Map Container */}
-      <div className="relative h-full w-full">
-        {/* Map */}
-        <div ref={mapRef} className="h-full w-full rounded-lg shadow-lg" />
-
-        {/* Info Window */}
-        {selectedLocation && (
-          <div className="absolute bottom-8 left-8 z-50">
-            <CustomInfoWindow
-              location={selectedLocation}
-              onClose={() => setSelectedLocation(null)}
-              onSave={handleSaveLocation}
-              lists={lists}
-            />
-          </div>
-        )}
-      </div>
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        zoom={14}
+        center={defaultCenter}
+        onLoad={handleMapLoad}
+        options={{
+          zoomControl: true,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false,
+          clickableIcons: true,
+          disableDefaultUI: false,
+        }}
+        onClick={(e: google.maps.MapMouseEvent) => {
+          // Prevent default InfoWindow
+          e.stop?.();
+        }}
+      />
     </div>
   );
 }
