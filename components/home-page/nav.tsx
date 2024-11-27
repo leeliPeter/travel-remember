@@ -40,7 +40,7 @@ export default function Nav({ user }: NavProps) {
   };
 
   const links = [
-    { href: "/explore", label: "Explore" },
+    // { href: "/explore", label: "Explore" },
     { href: "/mytrips", label: "My Trips" },
   ];
 
@@ -51,7 +51,7 @@ export default function Nav({ user }: NavProps) {
 
   return (
     <div className="absolute z-10 w-full top-0 left-0 right-0">
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-6 md:p-2">
         <div className="flex flex-row items-center justify-between">
           {/* left */}
           <div className="flex flex-row items-center space-x-16">

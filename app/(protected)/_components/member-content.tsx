@@ -139,7 +139,7 @@ export function MemberPage({ user }: MemberPageProps) {
 
   return (
     <div className=" mx-auto h-screen w-screen member-page flex items-center justify-center">
-      <Card className="sm:max-w-[600px] w-[90vw]  sm:h-auto  relative     mx-auto">
+      <Card className="sm:max-w-[400px] w-[90vw]  sm:h-auto  relative     mx-auto">
         <IoMdClose
           className="absolute top-4 right-4 text-2xl cursor-pointer"
           onClick={() => router.back()}

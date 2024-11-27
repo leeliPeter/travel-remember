@@ -231,10 +231,10 @@ export default function SearchLocation() {
 
   return (
     <div className="flex space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-col md:flex-row h-[90vh]">
-      <div className="box1 w-full md:w-1/4  flex-col flex  ">
-        {tripInfo && (
-          <div className="w-full bg-white  flex justify-center py-3 space-y-2 flex-col items-center">
-            <p className="text-xl font-bold w-[80%] pt-1 text-center truncate capitalize">
+      <div className="box1 w-full md:w-1/4 h-full  flex-col flex  ">
+        {tripInfo ? (
+          <div className="w-full bg-white  h-[15%] overflow-y-auto flex  flex-col items-center">
+            <p className="text-xl font-bold w-[80%] mt-2  text-center truncate capitalize">
               {tripInfo.name}
             </p>
             <div className="flex items-center justify-center">
@@ -246,30 +246,39 @@ export default function SearchLocation() {
                 {new Date(tripInfo.endDate).toLocaleDateString()}
               </p>
             </div>
-            <p className="text-sm max-w-xs px-2 line-clamp-4 text-center">
+            <p className="text-sm max-w-xs px-2 line-clamp-1 lg:line-clamp-2 text-center">
               {tripInfo.description}
             </p>
           </div>
+        ) : (
+          <div className="w-full bg-white  h-[15%] overflow-y-auto justify-center  font-bold flex  flex-col items-center">
+            Create a trip first
+          </div>
         )}
-        <div className="w-full bg-gray-200 h-full flex-col flex px-3 py-3 items-center">
+        <div className="w-full bg-gray-200 h-[85%] py-2 overflow-y-auto justify-between flex-col flex px-3  items-center">
           {/* Lists Section */}
-          <div className="w-full overflow-y-auto flex-1 mb-4">
-            <div className="text-xl font-bold pb-2">Lists</div>
+          <div className="w-full min-h-auto max-h-[70%]  ">
+            <div className="text-base sm:text-md md:text-lg h-8 font-bold ">
+              Lists
+            </div>
             {lists.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-[90%]  overflow-y-auto">
                 {lists.map((list) => (
                   <div key={list.id} className="flex flex-col">
                     <div
-                      className="bg-white rounded-lg p-3 hover:bg-gray-50 transition-colors group cursor-pointer sticky top-0 z-10 shadow-sm"
+                      className="bg-white rounded-lg p-2 sm:p-3 hover:bg-gray-50 transition-colors group cursor-pointer sticky top-0 z-10 shadow-sm"
                       onClick={() => handleListClick(list)}
                     >
                       <div className="flex justify-between items-center">
-                        <span className="text-sm md:text-base font-medium truncate pr-8">
+                        <span className="text-xs sm:text-sm md:text-base font-medium truncate pr-8">
                           {list.name}
                         </span>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs md:text-sm text-gray-500">
-                            {list.locations.length} locations
+                        <div className="flex items-center space-x-1 sm:space-x-2">
+                          <span className="text-[10px] sm:text-xs md:text-sm text-gray-500">
+                            {list.locations.length}
+                          </span>
+                          <span className="text-[10px] hidden xl:block sm:text-xs md:text-sm text-gray-500">
+                            locations
                           </span>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -314,28 +323,28 @@ export default function SearchLocation() {
                     {/* Locations Display */}
                     {selectedList?.id === list.id &&
                       list.locations.length > 0 && (
-                        <div className="mt-2 ml-4 space-y-2 overflow-y-auto h-40">
+                        <div className="mt-2 ml-2 sm:ml-4 space-y-2 overflow-y-auto">
                           {list.locations.map((location) => (
                             <div
                               key={location.id}
-                              className="bg-gray-50 rounded-lg p-2 text-sm relative group"
+                              className="bg-gray-50 rounded-lg p-1.5 sm:p-2 text-xs sm:text-sm relative group"
                             >
                               <button
                                 onClick={() =>
                                   handleDeleteLocation(location.id, list.id)
                                 }
-                                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                className="absolute top-1 sm:top-2 right-1 sm:right-2 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                               >
-                                <IoMdClose className="h-4 w-4" />
+                                <IoMdClose className="h-3 w-3 sm:h-4 sm:w-4" />
                               </button>
-                              <div className="font-medium text-blue-600 pr-6">
+                              <div className="font-medium text-blue-600 pr-4 sm:pr-6">
                                 {location.name}
                               </div>
                               {location.photoUrl && (
                                 <img
                                   src={location.photoUrl}
                                   alt={location.name}
-                                  className="w-full h-24 object-cover rounded-md mt-2"
+                                  className="w-full hidden lg:block h-16 sm:h-24 object-cover rounded-md mt-2"
                                 />
                               )}
                             </div>
@@ -346,7 +355,7 @@ export default function SearchLocation() {
                 ))}
               </div>
             ) : (
-              <div className="text-center text-gray-500 text-sm py-2">
+              <div className="text-center text-gray-500 text-xs sm:text-sm py-2">
                 No lists created yet
               </div>
             )}
@@ -354,20 +363,25 @@ export default function SearchLocation() {
 
           {/* Create List Form */}
           <div className="w-full">
-            <div className="text-xl font-bold pb-2">Create New List</div>
+            <div className="text-base sm:text-md md:text-lg font-bold py-1">
+              Create New List
+            </div>
             <div className="bg-white/90 rounded-lg w-full flex justify-center items-center">
-              <form onSubmit={handleSubmit} className="space-y-4 w-full p-4">
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-2 sm:space-y-3 w-full p-2 sm:p-3"
+              >
                 <Input
                   type="text"
                   placeholder="Enter list name"
                   value={listName}
                   onChange={(e) => setListName(e.target.value)}
-                  className="w-full"
+                  className="w-full text-xs sm:text-sm"
                   disabled={isLoading || !tripId}
                 />
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full text-xs sm:text-sm"
                   disabled={isLoading || !listName.trim() || !tripId}
                 >
                   {isLoading ? "Creating..." : "Create List"}

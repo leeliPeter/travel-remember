@@ -123,15 +123,9 @@ header > * {
   position: relative;
   z-index: 2;
 }
-@media (max-width: 768px) {
-  .trip-page {
-    background-image: url("/images/ship.jpg");
-    background-positioin: center;
-  }
-}
 
 .member-page {
-  background-image: url("/images/map-3.jpg");
+  background-image: url("/images/map-2.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

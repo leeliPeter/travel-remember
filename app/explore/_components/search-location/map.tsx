@@ -144,16 +144,52 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
       const result = await addLocation(locationData);
 
       if (result.error) {
-        toast.error(result.error);
-      } else if (result.success && result.location) {
-        toast.success(result.success);
+        toast.error(result.error, {
+          position: "bottom-right",
+          className: "bg-white",
+        });
+        return;
+      }
+
+      if (result.success && result.location) {
+        const selectedList = lists.find((list) => list.id === listId);
+
+        toast.success(
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              {place.photos?.[0]?.getUrl() && (
+                <img
+                  src={place.photos[0].getUrl()}
+                  alt={place.name || ""}
+                  className="w-10 h-10 rounded-md object-cover"
+                />
+              )}
+            </div>
+            <div>
+              <p className="font-medium">Location added!</p>
+              <p className="text-sm text-gray-600">
+                Added {place.name} to {selectedList?.name}
+              </p>
+            </div>
+          </div>,
+          {
+            position: "bottom-right",
+            duration: 4000,
+            className: "bg-white shadow-lg border border-gray-100",
+          }
+        );
+
         onLocationAdded(listId, result.location);
         if (infoWindowRef.current) {
           infoWindowRef.current.close();
         }
+        currentPlaceRef.current = null;
       }
     } catch (error) {
-      toast.error("Failed to add location");
+      toast.error("Failed to add location", {
+        position: "bottom-right",
+        className: "bg-white",
+      });
     } finally {
       setIsAddingLocation(false);
     }
