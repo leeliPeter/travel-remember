@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteLocation } from "@/actions/del-location";
 import Loading from "@/components/loading";
+import InvalidTrip from "./invaild-trip";
 
 interface Location {
   id: string;
@@ -67,6 +68,10 @@ export default function SearchLocation() {
   const searchParams = useSearchParams();
   const tripId = searchParams.get("tripId");
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  if (!tripId) {
+    return <InvalidTrip />;
+  }
 
   const fetchLists = async () => {
     if (!tripId) return;

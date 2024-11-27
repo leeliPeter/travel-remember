@@ -4,17 +4,16 @@ import { ImFacebook2 } from "react-icons/im";
 import { GrInstagram, GrLinkedin } from "react-icons/gr";
 
 export default function footer() {
-  const links = [
-    { href: "/", label: "Explore" },
-    { href: "/", label: "My Trips" },
-  ];
+  const links = [{ href: "/", label: "My Trips" }];
   return (
     <footer className=" bg-black px-6 py-12">
       <div className="max-w-6xl container mx-auto space-y-10 md:space-y-0 flex flex-col md:flex-row items-center md:justify-between">
         {/* left */}
         <div className="flex flex-col md:justify-start space-y-8">
           {/* <img src="./images/logo.svg" className="w-40" alt="" /> */}
-          <h2 className="text-4xl text-white font-bold">Travel</h2>
+          <h2 className="text-4xl text-white font-bold">
+            <Link href="/">Travel</Link>
+          </h2>
           <ul className="flex flex-col space-y-4 items-center md:flex-row md:space-y-0 md:space-x-8 md:justify-start">
             {links.map(({ href, label }) => (
               <li
