@@ -238,8 +238,8 @@ export default function SearchLocation() {
     <div className="flex space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-col md:flex-row h-[90vh]">
       <div className="box1 w-full md:w-1/4 h-full  flex-col flex  ">
         {tripInfo ? (
-          <div className="w-full bg-white  h-[15%] overflow-y-auto flex  flex-col items-center">
-            <p className="text-xl font-bold w-[80%] mt-2  text-center truncate capitalize">
+          <div className="w-full bg-white  h-[15%] overflow-y-auto flex  flex-col justify-around items-center">
+            <p className="text-xl font-bold w-[80%] mt-1  text-center truncate capitalize">
               {tripInfo.name}
             </p>
             <div className="flex items-center justify-center">
@@ -342,14 +342,14 @@ export default function SearchLocation() {
                               >
                                 <IoMdClose className="h-3 w-3 sm:h-4 sm:w-4" />
                               </button>
-                              <div className="font-medium text-blue-600 pr-4 sm:pr-6">
+                              <div className="font-medium text-blue-600 pr-4 sm:pr-6 truncate">
                                 {location.name}
                               </div>
                               {location.photoUrl && (
                                 <img
                                   src={location.photoUrl}
                                   alt={location.name}
-                                  className="w-full hidden lg:block h-16 sm:h-24 object-cover rounded-md mt-2"
+                                  className="w-full hidden xl:block h-16 sm:h-24 object-cover rounded-md mt-2"
                                 />
                               )}
                             </div>

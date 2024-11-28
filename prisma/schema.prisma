@@ -95,6 +95,9 @@ model Trip {
   updatedAt   DateTime  @updatedAt
   users       UserTrip[]
   lists       List[]    // One trip can have many lists
+  schedule    Schedule?
+
+  @@map("trips")
 }
 
 model List {
@@ -110,16 +113,17 @@ model List {
 }
 
 model Location {
-  id          String    @id @default(cuid())
-  name        String
-  address     String
-  lat         Float
-  lng         Float
-  photoUrl    String?
-  listId      String
-  list        List      @relation(fields: [listId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String         @id @default(cuid())
+  name          String
+  address       String
+  lat           Float
+  lng           Float
+  photoUrl      String?
+  listId        String
+  list          List          @relation(fields: [listId], references: [id], onDelete: Cascade)
+  locationPlans LocationPlan[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   @@index([listId])
 }
@@ -136,6 +140,45 @@ model UserTrip {
   @@unique([userId, tripId])
   @@index([userId])
   @@index([tripId])
+}
+
+model Schedule {
+  id          String        @id @default(cuid())
+  tripId      String        @unique
+  trip        Trip          @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  days        DaySchedule[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([tripId])
+}
+
+model DaySchedule {
+  id          String         @id @default(cuid())
+  date        DateTime
+  scheduleId  String
+  schedule    Schedule       @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  plans       LocationPlan[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([scheduleId])
+}
+
+model LocationPlan {
+  id            String      @id @default(cuid())
+  locationId    String
+  location      Location    @relation(fields: [locationId], references: [id])
+  dayScheduleId String
+  daySchedule   DaySchedule @relation(fields: [dayScheduleId], references: [id], onDelete: Cascade)
+  arrivalTime   DateTime
+  departureTime DateTime
+  commuteTime   Int?        // in minutes
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([locationId])
+  @@index([dayScheduleId])
 }
 
 

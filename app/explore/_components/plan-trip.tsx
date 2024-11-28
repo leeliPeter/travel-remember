@@ -1,17 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getTrip } from "@/actions/get-trip";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { getTrip } from "@/actions/get-trip";
+import { getListsByTripId } from "@/data/get-lists-by-tripId";
 import Loading from "@/components/loading";
+import { List, Location } from "@prisma/client";
+import SchedulePage from "./plan-trip/schedule";
 
-interface PlanTripProps {
-  tripId: string | null;
+interface ListWithLocations extends List {
+  locations: Location[];
 }
 
-export default function PlanTrip({ tripId }: PlanTripProps) {
+export default function PlanTrip({ tripId }: { tripId: string | null }) {
   const [isLoading, setIsLoading] = useState(true);
   const [tripInfo, setTripInfo] = useState<any>(null);
+  const [lists, setLists] = useState<ListWithLocations[]>([]);
+  const [selectedList, setSelectedList] = useState<ListWithLocations | null>(
+    null
+  );
+
+  const handleListClick = (list: ListWithLocations) => {
+    setSelectedList(selectedList?.id === list.id ? null : list);
+  };
 
   useEffect(() => {
     const fetchTripInfo = async () => {
@@ -30,6 +41,10 @@ export default function PlanTrip({ tripId }: PlanTripProps) {
 
         if (result.trip) {
           setTripInfo(result.trip);
+          const listsResult = await getListsByTripId(tripId);
+          if (listsResult.lists) {
+            setLists(listsResult.lists);
+          }
         }
       } catch (error) {
         console.error("Error fetching trip info:", error);
@@ -51,20 +66,97 @@ export default function PlanTrip({ tripId }: PlanTripProps) {
   }
 
   return (
-    <div className="flex space-y-4 md:space-y-0 md:space-x-4 flex-col md:flex-row h-[90vh]">
-      <div className="box1 w-full md:w-1/4 bg-white rounded-lg">
+    <div className="flex space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-col md:flex-row h-[90vh]">
+      <div className="box1 w-full md:w-1/4 h-full flex-col flex">
         {tripInfo ? (
-          <div className="p-4">
-            <h2 className="text-xl font-bold">{tripInfo.name}</h2>
-            {/* Add your plan trip content here */}
+          <div className="w-full bg-white h-[15%] overflow-y-auto flex flex-col justify-around items-center">
+            <p className="text-xl font-bold w-[80%] mt-1 text-center truncate capitalize">
+              {tripInfo.name}
+            </p>
+            <div className="flex items-center justify-center">
+              <p className="text-sm">
+                {new Date(tripInfo.startDate).toLocaleDateString()}
+              </p>
+              <p className="text-sm mx-2">-</p>
+              <p className="text-sm">
+                {new Date(tripInfo.endDate).toLocaleDateString()}
+              </p>
+            </div>
+            <p className="text-sm max-w-xs px-2 line-clamp-1 lg:line-clamp-2 text-center">
+              {tripInfo.description}
+            </p>
           </div>
         ) : (
-          <div className="p-4 text-center">
-            Please select a trip to start planning
+          <div className="w-full bg-white h-[15%] overflow-y-auto justify-center font-bold flex flex-col items-center">
+            Create a trip first
           </div>
         )}
+        <div className="w-full bg-gray-200 h-[85%] py-2 overflow-y-auto justify-between flex-col flex px-3 items-center">
+          {/* Lists Section */}
+          <div className="w-full min-h-auto max-h-[90%]">
+            <div className="text-base sm:text-md md:text-lg h-8 font-bold">
+              Lists
+            </div>
+            {lists.length > 0 ? (
+              <div className="space-y-2 max-h-full overflow-y-auto">
+                {lists.map((list) => (
+                  <div key={list.id} className="flex flex-col">
+                    <div
+                      className="bg-white rounded-lg p-2 sm:p-3 hover:bg-gray-50 transition-colors group cursor-pointer sticky top-0 z-10 shadow-sm"
+                      onClick={() => handleListClick(list)}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs sm:text-sm md:text-base font-medium truncate pr-8">
+                          {list.name}
+                        </span>
+                        <div className="flex items-center space-x-1 sm:space-x-2">
+                          <span className="text-[10px] sm:text-xs md:text-sm text-gray-500">
+                            {list.locations.length}
+                          </span>
+                          <span className="text-[10px] hidden xl:block sm:text-xs md:text-sm text-gray-500">
+                            locations
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Locations Display */}
+                    {selectedList?.id === list.id &&
+                      list.locations.length > 0 && (
+                        <div className="mt-2 ml-4 space-y-2 overflow-y-auto">
+                          {list.locations.map((location) => (
+                            <div
+                              key={location.id}
+                              className="bg-gray-50 rounded-lg p-2 text-sm relative group"
+                            >
+                              <div className="font-medium text-blue-600 pr-6 truncate">
+                                {location.name}
+                              </div>
+                              {location.photoUrl && (
+                                <img
+                                  src={location.photoUrl}
+                                  alt={location.name}
+                                  className="w-full h-24 object-cover hidden xl:block rounded-md mt-2"
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 text-xs sm:text-sm py-2">
+                No lists created yet
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="box2 w-full md:w-3/4 bg-white rounded-lg"></div>
+      <div className="box2 h-full w-full md:w-3/4 ">
+        {tripInfo && <SchedulePage trip={tripInfo} />}
+      </div>
     </div>
   );
 }
