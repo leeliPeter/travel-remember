@@ -2,9 +2,9 @@
 const nextConfig = {
   images: {
     domains: [
+      "maps.googleapis.com",
       "lh3.googleusercontent.com",
-      "avatars.githubusercontent.com",
-      "res.cloudinary.com",
+      "maps.gstatic.com",
     ],
   },
 };

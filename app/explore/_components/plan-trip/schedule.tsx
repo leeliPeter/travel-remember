@@ -1,10 +1,53 @@
 "use client";
 
-import React from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import Day from "./day";
-import { Trip } from "@prisma/client";
+import { Trip, Location } from "@prisma/client";
 
-export default function SchedulePage({ trip }: { trip: Trip }) {
+interface DaySchedule {
+  dayId: string;
+  date: Date;
+  locations: Location[];
+}
+
+const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
+  const [daySchedules, setDaySchedules] = useState<DaySchedule[]>([]);
+
+  // Expose handleLocationDrop to parent
+  useImperativeHandle(ref, () => ({
+    handleLocationDrop: (dayId: string, location: Location) => {
+      setDaySchedules((prevSchedules) => {
+        // Find existing schedule or create new one
+        const existingScheduleIndex = prevSchedules.findIndex(
+          (s) => s.dayId === dayId
+        );
+
+        if (existingScheduleIndex >= 0) {
+          // Update existing schedule
+          const newSchedules = [...prevSchedules];
+          newSchedules[existingScheduleIndex] = {
+            ...newSchedules[existingScheduleIndex],
+            locations: [
+              ...newSchedules[existingScheduleIndex].locations,
+              location,
+            ],
+          };
+          return newSchedules;
+        } else {
+          // Create new schedule
+          return [
+            ...prevSchedules,
+            {
+              dayId,
+              date: new Date(), // You might want to pass the actual date
+              locations: [location],
+            },
+          ];
+        }
+      });
+    },
+  }));
+
   if (!trip || !trip.startDate || !trip.endDate) {
     return (
       <div className="w-full h-full flex items-center justify-center text-gray-500">
@@ -13,7 +56,6 @@ export default function SchedulePage({ trip }: { trip: Trip }) {
     );
   }
 
-  // Function to generate dates between start and end date
   const getDatesInRange = (startDate: Date, endDate: Date) => {
     const dates = [];
     const currentDate = new Date(startDate);
@@ -27,7 +69,6 @@ export default function SchedulePage({ trip }: { trip: Trip }) {
     return dates;
   };
 
-  // Get array of dates for the trip
   const tripDates = getDatesInRange(
     new Date(trip.startDate),
     new Date(trip.endDate)
@@ -36,17 +77,27 @@ export default function SchedulePage({ trip }: { trip: Trip }) {
   return (
     <div className="w-full h-full overflow-x-auto bg-gray-100/70 p-3">
       <div className="flex h-full space-x-4 min-w-fit">
-        {tripDates.map((date, index) => (
-          <Day
-            key={index}
-            date={date.toLocaleDateString("en-US", {
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-            })}
-          />
-        ))}
+        {tripDates.map((date, index) => {
+          const dayId = `day-${index}`;
+          const daySchedule = daySchedules.find((s) => s.dayId === dayId);
+
+          return (
+            <Day
+              key={index}
+              id={dayId}
+              date={date.toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })}
+              locations={daySchedule?.locations || []}
+            />
+          );
+        })}
       </div>
     </div>
   );
-}
+});
+
+SchedulePage.displayName = "SchedulePage";
+export default SchedulePage;
