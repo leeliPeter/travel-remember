@@ -32,21 +32,27 @@ export default function Day({ date, id, locations }: DayProps) {
       } flex flex-col items-center p-2 rounded-lg transition-colors`}
     >
       <div className="date font-bold text-gray-800 mb-3">{date}</div>
-      <div className="w-full space-y-2 min-h-[100px]">
+      <div className="w-full min-h-[100px]">
         <SortableContext
           items={locations.map((loc) => loc.id)}
           strategy={verticalListSortingStrategy}
         >
-          {locations.map((location, index) => (
-            <LocationBox
-              key={`${location.id}-${id}-${index}`}
-              id={location.id}
-              dayId={id}
-              name={location.name}
-              img={location.photoUrl}
-              address={location.address}
-            />
-          ))}
+          <div className="space-y-2 transition-all duration-300 ease-in-out">
+            {locations.map((location, index) => (
+              <div
+                key={`${location.id}-${id}-${index}`}
+                className="transition-all duration-300 ease-in-out"
+              >
+                <LocationBox
+                  id={location.id}
+                  dayId={id}
+                  name={location.name}
+                  img={location.photoUrl}
+                  address={location.address}
+                />
+              </div>
+            ))}
+          </div>
         </SortableContext>
       </div>
     </div>

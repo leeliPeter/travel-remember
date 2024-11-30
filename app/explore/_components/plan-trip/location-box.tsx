@@ -28,6 +28,8 @@ export default function LocationBox({
     transform,
     transition,
     isDragging,
+    isOver,
+    active,
   } = useSortable({
     id: id,
     data: {
@@ -43,8 +45,10 @@ export default function LocationBox({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: "transform 300ms ease, margin 300ms ease",
     opacity: isDragging ? 0.5 : 1,
+    marginTop:
+      isOver && active?.data?.current?.type === "location" ? "96px" : "0px",
   };
 
   return (
