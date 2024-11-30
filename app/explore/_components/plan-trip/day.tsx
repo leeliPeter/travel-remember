@@ -33,17 +33,17 @@ export default function Day({ date, id, locations }: DayProps) {
       <div className="date font-bold text-gray-800 mb-3">{date}</div>
       <div className="w-full space-y-2 min-h-[100px]">
         <SortableContext
-          items={locations}
+          items={locations.map((loc) => loc.id)}
           strategy={verticalListSortingStrategy}
         >
           {locations.map((location, index) => (
             <LocationBox
               key={`${location.id}-${id}-${index}`}
               id={location.id}
+              dayId={id}
               name={location.name}
               img={location.photoUrl}
               address={location.address}
-              dayId={id}
             />
           ))}
         </SortableContext>

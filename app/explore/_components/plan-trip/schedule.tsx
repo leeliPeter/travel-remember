@@ -14,27 +14,26 @@ interface DaySchedule {
 const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   const [daySchedules, setDaySchedules] = useState<DaySchedule[]>([]);
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
+  // Add this function to generate a unique ID
+  const generateUniqueId = () => {
+    return `loc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  };
 
-    // Handle dropping from plan-trip list
-    if (!active.data.current?.dayId) {
-      const location = active.data.current as Location;
-      const dayId = over.id as string;
-
-      // Create new location only when coming from plan-trip
-      const newLocation: Location = {
-        ...location,
-        id: generateUniqueId(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
+  // Update handleLocationDrop
+  useImperativeHandle(ref, () => ({
+    handleLocationDrop: (dayId: string, location: Location) => {
       setDaySchedules((prevSchedules) => {
         const existingScheduleIndex = prevSchedules.findIndex(
           (s) => s.dayId === dayId
         );
+
+        // Create a new location with a different ID
+        const newLocation: Location = {
+          ...location,
+          id: generateUniqueId(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
 
         if (existingScheduleIndex >= 0) {
           const newSchedules = [...prevSchedules];
@@ -57,134 +56,79 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           ];
         }
       });
-      return;
-    }
-
-    // Handle reordering within or between days
-    const sourceDayId = active.data.current.dayId;
-    const targetDayId = over.id;
-
-    if (sourceDayId === targetDayId) {
-      // Moving within the same day
-      setDaySchedules((prevSchedules) => {
-        return prevSchedules.map((schedule) => {
-          if (schedule.dayId === sourceDayId) {
-            const locations = [...schedule.locations];
-            const oldIndex = locations.findIndex((loc) => loc.id === active.id);
-            const newIndex = locations.findIndex((loc) => loc.id === over.id);
-
-            if (oldIndex !== -1 && newIndex !== -1) {
-              return {
-                ...schedule,
-                locations: arrayMove(locations, oldIndex, newIndex),
-              };
-            }
-          }
-          return schedule;
-        });
-      });
-    } else {
-      // Moving between different days
-      setDaySchedules((prevSchedules) => {
-        const sourceSchedule = prevSchedules.find(
-          (s) => s.dayId === sourceDayId
-        );
-        const targetSchedule = prevSchedules.find(
-          (s) => s.dayId === targetDayId
-        );
-
-        if (!sourceSchedule || !targetSchedule) return prevSchedules;
-
-        const movedLocation = sourceSchedule.locations.find(
-          (loc) => loc.id === active.id
-        );
-
-        if (!movedLocation) return prevSchedules;
-
-        return prevSchedules.map((schedule) => {
-          if (schedule.dayId === sourceDayId) {
-            return {
-              ...schedule,
-              locations: schedule.locations.filter(
-                (loc) => loc.id !== active.id
-              ),
-            };
-          }
-          if (schedule.dayId === targetDayId) {
-            return {
-              ...schedule,
-              locations: [...schedule.locations, movedLocation],
-            };
-          }
-          return schedule;
-        });
-      });
-    }
-  };
-
-  // Add this function to generate a unique ID
-  const generateUniqueId = () => {
-    return `loc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  };
-
-  // Update handleLocationDrop
-  useImperativeHandle(ref, () => ({
-    handleLocationDrop: (dayId: string, location: Location) => {
-      setDaySchedules((prevSchedules) => {
-        const existingScheduleIndex = prevSchedules.findIndex(
-          (s) => s.dayId === dayId
-        );
-
-        // Create a new location with a different ID
-        const newLocation: Location = {
-          ...location,
-          id: generateUniqueId(), // New unique ID
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-
-        if (existingScheduleIndex >= 0) {
-          const newSchedules = [...prevSchedules];
-          newSchedules[existingScheduleIndex] = {
-            ...newSchedules[existingScheduleIndex],
-            locations: [
-              ...newSchedules[existingScheduleIndex].locations,
-              newLocation, // Use the new location
-            ],
-          };
-          return newSchedules;
-        } else {
-          return [
-            ...prevSchedules,
-            {
-              dayId,
-              date: new Date(),
-              locations: [newLocation], // Use the new location
-            },
-          ];
-        }
-      });
     },
     handleReorder: (active: any, over: any) => {
       const sourceDayId = active.data.current.dayId;
-      const targetDayId = over.id;
+      const targetDayId = over.data.current?.dayId;
 
       if (sourceDayId === targetDayId) {
         setDaySchedules((prevSchedules) => {
           return prevSchedules.map((schedule) => {
             if (schedule.dayId === sourceDayId) {
-              const locations = [...schedule.locations];
-              const oldIndex = locations.findIndex(
+              // Find the locations for this day
+              const dayLocations = [...schedule.locations];
+              const oldIndex = dayLocations.findIndex(
                 (loc) => loc.id === active.id
               );
-              const newIndex = locations.findIndex((loc) => loc.id === over.id);
+              const newIndex = dayLocations.findIndex(
+                (loc) => loc.id === over.id
+              );
+
+              console.log("Reordering:", {
+                oldIndex,
+                newIndex,
+                dayLocations,
+                activeId: active.id,
+                overId: over.id,
+              });
 
               if (oldIndex !== -1 && newIndex !== -1) {
+                // Create new array with reordered locations
+                const reorderedLocations = arrayMove(
+                  dayLocations,
+                  oldIndex,
+                  newIndex
+                );
+
+                // Return updated schedule with new locations order
                 return {
                   ...schedule,
-                  locations: arrayMove(locations, oldIndex, newIndex),
+                  locations: reorderedLocations,
                 };
               }
+            }
+            return schedule;
+          });
+        });
+      } else {
+        // Handle moving between days
+        setDaySchedules((prevSchedules) => {
+          const sourceSchedule = prevSchedules.find(
+            (s) => s.dayId === sourceDayId
+          );
+          if (!sourceSchedule) return prevSchedules;
+
+          const movedLocation = sourceSchedule.locations.find(
+            (loc) => loc.id === active.id
+          );
+          if (!movedLocation) return prevSchedules;
+
+          return prevSchedules.map((schedule) => {
+            if (schedule.dayId === sourceDayId) {
+              // Remove from source day
+              return {
+                ...schedule,
+                locations: schedule.locations.filter(
+                  (loc) => loc.id !== active.id
+                ),
+              };
+            }
+            if (schedule.dayId === targetDayId) {
+              // Add to target day
+              return {
+                ...schedule,
+                locations: [...schedule.locations, movedLocation],
+              };
             }
             return schedule;
           });

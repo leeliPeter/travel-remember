@@ -29,16 +29,14 @@ export default function LocationBox({
     transition,
     isDragging,
   } = useSortable({
-    id,
+    id: id,
     data: {
       type: "locationBox",
       dayId,
-      location: {
-        id,
-        name,
-        address,
-        img,
-      },
+      id,
+      name,
+      address,
+      img,
     },
   });
 
