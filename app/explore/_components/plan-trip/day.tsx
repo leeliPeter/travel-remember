@@ -2,6 +2,10 @@ import React from "react";
 import LocationBox from "./location-box";
 import { useDroppable } from "@dnd-kit/core";
 import { Location } from "@prisma/client";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface DayProps {
   date: string;
@@ -15,7 +19,6 @@ export default function Day({ date, id, locations }: DayProps) {
     data: {
       type: "day",
       dayId: id,
-      index: locations.length,
       locations,
     },
   });
@@ -29,19 +32,21 @@ export default function Day({ date, id, locations }: DayProps) {
     >
       <div className="date font-bold text-gray-800 mb-3">{date}</div>
       <div className="w-full space-y-2 min-h-[100px]">
-        {locations &&
-          locations.map((location, index) => (
-            <div key={`${location.id}-${id}-${index}`}>
-              <LocationBox
-                id={location.id}
-                dayId={id}
-                index={index}
-                name={location.name}
-                img={location.photoUrl}
-                address={location.address}
-              />
-            </div>
+        <SortableContext
+          items={locations}
+          strategy={verticalListSortingStrategy}
+        >
+          {locations.map((location, index) => (
+            <LocationBox
+              key={`${location.id}-${id}-${index}`}
+              id={location.id}
+              name={location.name}
+              img={location.photoUrl}
+              address={location.address}
+              dayId={id}
+            />
           ))}
+        </SortableContext>
       </div>
     </div>
   );

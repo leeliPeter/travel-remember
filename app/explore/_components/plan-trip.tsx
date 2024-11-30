@@ -14,6 +14,7 @@ import {
   useDraggable,
   DragOverlay,
 } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 
 interface ListWithLocations extends List {
   locations: Location[];
@@ -41,29 +42,24 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over || !active.data.current) return;
+    if (!over) {
+      setActiveLocation(null);
+      return;
+    }
 
-    // If dropping a location from the list
-    if (!active.data.current.dayId) {
-      // This means it's from the list
+    if (
+      active.data.current?.type === "location" &&
+      over.id.toString().startsWith("day-")
+    ) {
       const location = active.data.current as Location;
       const dayId = over.id as string;
 
       if (scheduleRef.current) {
         scheduleRef.current.handleLocationDrop(dayId, location);
       }
-    }
-    // If moving between or within days
-    else {
-      const activeData = active.data.current as {
-        type: string;
-        dayId: string;
-        index: number;
-        id: string;
-      };
-
+    } else if (active.data.current?.type === "locationBox") {
       if (scheduleRef.current) {
-        scheduleRef.current.handleLocationDrop(over.id as string, activeData);
+        scheduleRef.current.handleReorder(active, over);
       }
     }
 
@@ -222,7 +218,10 @@ function DraggableLocation({ location }: { location: Location }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: location.id,
-      data: location,
+      data: {
+        type: "location",
+        ...location,
+      },
     });
 
   const style = transform
