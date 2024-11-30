@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import { List, Location } from "@prisma/client";
+import { useDraggable } from "@dnd-kit/core";
 
 interface LocationBoxProps {
   id: string;
   name: string;
   img: string | null;
   address: string;
+  index: number;
+  dayId: string;
 }
 
 export default function LocationBox({
@@ -14,12 +16,44 @@ export default function LocationBox({
   name,
   img,
   address,
+  index,
+  dayId,
 }: LocationBoxProps) {
   const [arrivalTime, setArrivalTime] = useState("10:00");
   const [departureTime, setDepartureTime] = useState("12:00");
 
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: `${id}-${dayId}-${index}`,
+      data: {
+        type: "locationBox",
+        id,
+        index,
+        dayId,
+        name,
+        img,
+        address,
+        arrivalTime,
+        departureTime,
+      },
+    });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        opacity: isDragging ? 0.5 : 1,
+      }
+    : undefined;
+
   return (
-    <div className="location-box w-full bg-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={style}
+      className={`location-box w-full bg-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-move
+        ${isDragging ? "ring-2 ring-blue-400" : ""}`}
+    >
       <div className="flex items-center h-24 flex-row p-2">
         <div className="place-img w-2/5 h-full">
           {img && (
@@ -38,6 +72,7 @@ export default function LocationBox({
             <input
               type="time"
               value={arrivalTime}
+              onClick={(e) => e.stopPropagation()}
               onChange={(e) => setArrivalTime(e.target.value)}
               className="text-sm bg-white border border-gray-300 rounded px-1 focus:outline-none focus:border-blue-500 transition-colors"
             />
@@ -49,6 +84,7 @@ export default function LocationBox({
             <input
               type="time"
               value={departureTime}
+              onClick={(e) => e.stopPropagation()}
               onChange={(e) => setDepartureTime(e.target.value)}
               className="text-sm bg-white border border-gray-300 rounded px-1 focus:outline-none focus:border-blue-500 transition-colors"
             />

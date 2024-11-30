@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import Day from "./day";
 import { Trip, Location } from "@prisma/client";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
 
 interface DaySchedule {
   dayId: string;
@@ -12,40 +18,115 @@ interface DaySchedule {
 
 const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   const [daySchedules, setDaySchedules] = useState<DaySchedule[]>([]);
+  const scheduleRef = useRef<any>(null);
 
-  // Expose handleLocationDrop to parent
-  useImperativeHandle(ref, () => ({
-    handleLocationDrop: (dayId: string, location: Location) => {
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || !active.data.current) return;
+
+    const activeData = active.data.current as {
+      type: string;
+      dayId?: string;
+      index?: number;
+      id: string;
+      name: string;
+      address: string;
+      photoUrl?: string;
+    };
+
+    // Handle dropping a new location from the list
+    if (activeData.type === "location") {
+      const location = {
+        id: activeData.id,
+        name: activeData.name,
+        address: activeData.address,
+        photoUrl: activeData.photoUrl,
+        listId: "",
+        lat: 0,
+        lng: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as Location;
+
+      handleLocationDrop(over.id as string, location);
+      return;
+    }
+
+    // Handle reordering within a day
+    if (activeData.type === "locationBox" && activeData.dayId) {
       setDaySchedules((prevSchedules) => {
-        // Find existing schedule or create new one
-        const existingScheduleIndex = prevSchedules.findIndex(
-          (s) => s.dayId === dayId
-        );
+        // Create a new array to avoid mutating state
+        const newSchedules = prevSchedules.map((schedule) => {
+          // Remove from source day
+          if (schedule.dayId === activeData.dayId) {
+            return {
+              ...schedule,
+              locations: schedule.locations.filter(
+                (_, idx) => idx !== activeData.index
+              ),
+            };
+          }
+          // Add to target day
+          if (schedule.dayId === over.id) {
+            const movedLocation = prevSchedules.find(
+              (s) => s.dayId === activeData.dayId
+            )?.locations[activeData.index!];
 
-        if (existingScheduleIndex >= 0) {
-          // Update existing schedule
-          const newSchedules = [...prevSchedules];
-          newSchedules[existingScheduleIndex] = {
-            ...newSchedules[existingScheduleIndex],
-            locations: [
-              ...newSchedules[existingScheduleIndex].locations,
-              location,
-            ],
-          };
-          return newSchedules;
-        } else {
-          // Create new schedule
-          return [
-            ...prevSchedules,
-            {
-              dayId,
-              date: new Date(), // You might want to pass the actual date
-              locations: [location],
-            },
-          ];
-        }
+            if (movedLocation) {
+              const newLocations = [...schedule.locations];
+              newLocations.splice(
+                over.data.current?.index || 0,
+                0,
+                movedLocation
+              );
+              return {
+                ...schedule,
+                locations: newLocations,
+              };
+            }
+          }
+          return schedule;
+        });
+
+        return newSchedules;
       });
-    },
+    }
+  };
+
+  // Move handleLocationDrop outside useImperativeHandle
+  const handleLocationDrop = (dayId: string, location: Location) => {
+    setDaySchedules((prevSchedules) => {
+      const existingScheduleIndex = prevSchedules.findIndex(
+        (s) => s.dayId === dayId
+      );
+
+      if (existingScheduleIndex >= 0) {
+        const newSchedules = [...prevSchedules];
+        newSchedules[existingScheduleIndex] = {
+          ...newSchedules[existingScheduleIndex],
+          locations: [
+            ...newSchedules[existingScheduleIndex].locations,
+            location,
+          ],
+        };
+        return newSchedules;
+      } else {
+        return [
+          ...prevSchedules,
+          {
+            dayId,
+            date: new Date(),
+            locations: [location],
+          },
+        ];
+      }
+    });
+  };
+
+  // Update useImperativeHandle to use the handleLocationDrop function
+  useImperativeHandle(ref, () => ({
+    handleLocationDrop,
   }));
 
   if (!trip || !trip.startDate || !trip.endDate) {
@@ -83,7 +164,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
 
           return (
             <Day
-              key={index}
+              key={dayId}
               id={dayId}
               date={date.toLocaleDateString("en-US", {
                 weekday: "short",

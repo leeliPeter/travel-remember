@@ -1,21 +1,22 @@
 import React from "react";
 import LocationBox from "./location-box";
-import { useDroppable, useDraggable } from "@dnd-kit/core";
+import { useDroppable } from "@dnd-kit/core";
 import { Location } from "@prisma/client";
 
 interface DayProps {
   date: string;
   id: string;
   locations: Location[];
-  onLocationDrop?: (dayId: string, location: Location) => void;
 }
 
-export default function Day({ date, id, locations, onLocationDrop }: DayProps) {
+export default function Day({ date, id, locations }: DayProps) {
   const { setNodeRef, isOver } = useDroppable({
-    id: id,
+    id,
     data: {
+      type: "day",
       dayId: id,
-      accepts: "location",
+      index: locations.length,
+      locations,
     },
   });
 
@@ -30,13 +31,16 @@ export default function Day({ date, id, locations, onLocationDrop }: DayProps) {
       <div className="w-full space-y-2 min-h-[100px]">
         {locations &&
           locations.map((location, index) => (
-            <LocationBox
-              key={`${location.id}-${id}-${index}`}
-              id={location.id}
-              name={location.name}
-              img={location.photoUrl}
-              address={location.address}
-            />
+            <div key={`${location.id}-${id}-${index}`}>
+              <LocationBox
+                id={location.id}
+                dayId={id}
+                index={index}
+                name={location.name}
+                img={location.photoUrl}
+                address={location.address}
+              />
+            </div>
           ))}
       </div>
     </div>

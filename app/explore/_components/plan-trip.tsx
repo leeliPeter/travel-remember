@@ -41,12 +41,29 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
+    if (!over || !active.data.current) return;
+
+    // If dropping a location from the list
+    if (!active.data.current.dayId) {
+      // This means it's from the list
       const location = active.data.current as Location;
       const dayId = over.id as string;
 
       if (scheduleRef.current) {
         scheduleRef.current.handleLocationDrop(dayId, location);
+      }
+    }
+    // If moving between or within days
+    else {
+      const activeData = active.data.current as {
+        type: string;
+        dayId: string;
+        index: number;
+        id: string;
+      };
+
+      if (scheduleRef.current) {
+        scheduleRef.current.handleLocationDrop(over.id as string, activeData);
       }
     }
 
