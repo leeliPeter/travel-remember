@@ -39,7 +39,6 @@ export default function LocationBox({
       name,
       address,
       img,
-      sortableLocationId: id,
     },
   });
 
@@ -48,7 +47,12 @@ export default function LocationBox({
     transition: "transform 300ms ease, margin 300ms ease",
     opacity: isDragging ? 0.5 : 1,
     marginTop:
-      isOver && active?.data?.current?.type === "location" ? "96px" : "0px",
+      isOver &&
+      (active?.data?.current?.type === "location" ||
+        (active?.data?.current?.type === "locationBox" &&
+          active?.data?.current?.dayId !== dayId))
+        ? "96px"
+        : "0px",
   };
 
   return (

@@ -86,12 +86,13 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
     handleReorder: (active: any, over: any) => {
       const sourceDayId = active.data.current.dayId;
       const targetDayId = over.data.current?.dayId;
+      const overId = over.data?.current?.id;
 
       if (sourceDayId === targetDayId) {
+        // Handle reordering within same day
         setDaySchedules((prevSchedules) => {
           return prevSchedules.map((schedule) => {
             if (schedule.dayId === sourceDayId) {
-              // Find the locations for this day
               const dayLocations = [...schedule.locations];
               const oldIndex = dayLocations.findIndex(
                 (loc) => loc.id === active.id
@@ -100,26 +101,10 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
                 (loc) => loc.id === over.id
               );
 
-              console.log("Reordering:", {
-                oldIndex,
-                newIndex,
-                dayLocations,
-                activeId: active.id,
-                overId: over.id,
-              });
-
               if (oldIndex !== -1 && newIndex !== -1) {
-                // Create new array with reordered locations
-                const reorderedLocations = arrayMove(
-                  dayLocations,
-                  oldIndex,
-                  newIndex
-                );
-
-                // Return updated schedule with new locations order
                 return {
                   ...schedule,
-                  locations: reorderedLocations,
+                  locations: arrayMove(dayLocations, oldIndex, newIndex),
                 };
               }
             }
@@ -139,9 +124,44 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           );
           if (!movedLocation) return prevSchedules;
 
+          // Create new location with unique ID
+          const newLocation: Location = {
+            ...movedLocation,
+            id: generateUniqueId(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+
+          // Check if target day exists
+          const targetSchedule = prevSchedules.find(
+            (s) => s.dayId === targetDayId
+          );
+
+          if (!targetSchedule) {
+            // Create new day schedule
+            const newDaySchedule: DaySchedule = {
+              dayId: targetDayId,
+              date: new Date(),
+              locations: [newLocation],
+            };
+
+            return prevSchedules
+              .map((schedule) => {
+                if (schedule.dayId === sourceDayId) {
+                  return {
+                    ...schedule,
+                    locations: schedule.locations.filter(
+                      (loc) => loc.id !== active.id
+                    ),
+                  };
+                }
+                return schedule;
+              })
+              .concat(newDaySchedule);
+          }
+
           return prevSchedules.map((schedule) => {
             if (schedule.dayId === sourceDayId) {
-              // Remove from source day
               return {
                 ...schedule,
                 locations: schedule.locations.filter(
@@ -150,10 +170,27 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
               };
             }
             if (schedule.dayId === targetDayId) {
-              // Add to target day
+              const targetLocations = [...schedule.locations];
+
+              if (overId) {
+                // Find the position to insert at
+                const overIndex = targetLocations.findIndex(
+                  (loc) => loc.id === overId
+                );
+                if (overIndex !== -1) {
+                  // Insert at specific position
+                  targetLocations.splice(overIndex, 0, newLocation);
+                  return {
+                    ...schedule,
+                    locations: targetLocations,
+                  };
+                }
+              }
+
+              // If no specific position, add to end
               return {
                 ...schedule,
-                locations: [...schedule.locations, movedLocation],
+                locations: [...targetLocations, newLocation],
               };
             }
             return schedule;
