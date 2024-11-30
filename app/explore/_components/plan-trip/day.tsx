@@ -20,6 +20,7 @@ export default function Day({ date, id, locations }: DayProps) {
       type: "day",
       dayId: id,
       locations,
+      sortableLocationId: null,
     },
   });
 

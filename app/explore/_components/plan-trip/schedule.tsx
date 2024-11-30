@@ -21,7 +21,11 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
 
   // Update handleLocationDrop
   useImperativeHandle(ref, () => ({
-    handleLocationDrop: (dayId: string, location: Location) => {
+    handleLocationDrop: (
+      dayId: string,
+      location: Location,
+      overId?: string
+    ) => {
       setDaySchedules((prevSchedules) => {
         const existingScheduleIndex = prevSchedules.findIndex(
           (s) => s.dayId === dayId
@@ -37,15 +41,37 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
 
         if (existingScheduleIndex >= 0) {
           const newSchedules = [...prevSchedules];
-          newSchedules[existingScheduleIndex] = {
-            ...newSchedules[existingScheduleIndex],
-            locations: [
-              ...newSchedules[existingScheduleIndex].locations,
-              newLocation,
-            ],
-          };
+          const daySchedule = newSchedules[existingScheduleIndex];
+
+          if (overId) {
+            // Find the target location's index
+            const overIndex = daySchedule.locations.findIndex(
+              (loc) => loc.id === overId
+            );
+
+            if (overIndex !== -1) {
+              // Insert the new location at the beginning of the array
+              const newLocations = [...daySchedule.locations];
+              newLocations.unshift(newLocation);
+
+              // Use arrayMove to move it to the desired position
+              const reorderedLocations = arrayMove(newLocations, 0, overIndex);
+
+              newSchedules[existingScheduleIndex] = {
+                ...daySchedule,
+                locations: reorderedLocations,
+              };
+            }
+          } else {
+            // If not dropping over a location, append to the end
+            newSchedules[existingScheduleIndex] = {
+              ...daySchedule,
+              locations: [...daySchedule.locations, newLocation],
+            };
+          }
           return newSchedules;
         } else {
+          // Create new day schedule
           return [
             ...prevSchedules,
             {

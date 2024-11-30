@@ -47,15 +47,26 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
       return;
     }
 
-    if (
-      active.data.current?.type === "location" &&
-      over.id.toString().startsWith("day-")
-    ) {
-      const location = active.data.current as Location;
-      const dayId = over.id as string;
+    if (active.data.current?.type === "location") {
+      let targetDayId: string;
+      let overId: string | undefined;
 
+      if (over.data.current?.type === "locationBox") {
+        // If dropping over a location box, use its day ID and its own ID as overId
+        targetDayId = over.data.current.dayId;
+        overId = over.data.current.id;
+      } else if (over.id.toString().startsWith("day-")) {
+        // If dropping directly on a day
+        targetDayId = over.id as string;
+        overId = undefined;
+      } else {
+        setActiveLocation(null);
+        return;
+      }
+
+      const location = active.data.current as Location;
       if (scheduleRef.current) {
-        scheduleRef.current.handleLocationDrop(dayId, location);
+        scheduleRef.current.handleLocationDrop(targetDayId, location, overId);
       }
     } else if (active.data.current?.type === "locationBox") {
       if (scheduleRef.current) {

@@ -37,6 +37,7 @@ export default function LocationBox({
       name,
       address,
       img,
+      sortableLocationId: id,
     },
   });
 
