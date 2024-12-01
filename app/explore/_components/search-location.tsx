@@ -236,7 +236,7 @@ export default function SearchLocation() {
 
   return (
     <div className="flex space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-col md:flex-row h-[90vh]">
-      <div className="box1 w-full md:w-1/4 h-full  flex-col flex  ">
+      <div className="box1 w-full md:w-1/5 h-full  flex-col flex  ">
         {tripInfo ? (
           <div className="w-full bg-white  h-[15%] overflow-y-auto flex  flex-col justify-around items-center">
             <p className="text-xl font-bold w-[80%] mt-1  text-center truncate capitalize">
@@ -396,7 +396,7 @@ export default function SearchLocation() {
           </div>
         </div>
       </div>
-      <div className="box2 w-full h-full md:w-3/4 bg-white rounded-lg">
+      <div className="box2 w-full h-full md:w-4/5 bg-white rounded-lg">
         <Map
           lists={lists}
           onLocationAdded={handleLocationAdded}

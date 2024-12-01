@@ -121,7 +121,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
       <div className="flex space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-col md:flex-row h-[90vh]">
-        <div className="box1 w-full md:w-1/4 h-full flex-col flex">
+        <div className="box1 w-full md:w-1/5 h-full flex-col flex">
           {tripInfo ? (
             <div className="w-full bg-white h-[15%] overflow-y-auto flex flex-col justify-around items-center">
               <p className="text-xl font-bold w-[80%] mt-1 text-center truncate capitalize">
@@ -195,7 +195,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
             </div>
           </div>
         </div>
-        <div className="box2 h-full w-full md:w-3/4">
+        <div className="box2 h-full w-full md:w-4/5">
           {tripInfo && <SchedulePage ref={scheduleRef} trip={tripInfo} />}
         </div>
         <DragOverlay
