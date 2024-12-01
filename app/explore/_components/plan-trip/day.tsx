@@ -97,7 +97,7 @@ function CommuteTime({
           setTravelMode(value as google.maps.TravelMode)
         }
       >
-        <SelectTrigger className="w-[125px] h-8">
+        <SelectTrigger className="w-[120px] h-6 text-xs">
           <SelectValue>
             <div className="flex items-center gap-2">
               {travelMode === "DRIVING" && <Car className="w-4 h-4" />}
@@ -109,19 +109,19 @@ function CommuteTime({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={window.google.maps.TravelMode.DRIVING}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Car className="w-4 h-4" />
               DRIVING
             </div>
           </SelectItem>
           <SelectItem value={window.google.maps.TravelMode.WALKING}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Footprints className="w-4 h-4" />
               WALKING
             </div>
           </SelectItem>
           <SelectItem value={window.google.maps.TravelMode.TRANSIT}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Train className="w-4 h-4" />
               TRANSIT
             </div>

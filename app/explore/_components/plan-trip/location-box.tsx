@@ -45,7 +45,7 @@ export default function LocationBox({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: "transform 300ms ease, margin 300ms ease",
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.3 : 1,
     marginTop:
       isOver &&
       (active?.data?.current?.type === "location" ||
@@ -75,7 +75,7 @@ export default function LocationBox({
             />
           )}
         </div>
-        <div className="place-info text-xs flex flex-col h-24 justify-between p-1 space-y-1 w-2/3">
+        <div className="place-info text-xs flex flex-col  justify-between pl-1 space-y-1 w-2/3">
           <div className="arrive-time flex items-center justify-between text-gray-500">
             <div className="text-xs">Arrive:</div>
             <input
@@ -86,7 +86,7 @@ export default function LocationBox({
             />
           </div>
           <div className="place-name text-sm font-medium truncate">{name}</div>
-          <div className="place-address text-gray-500 truncate">{address}</div>
+          {/* <div className="place-address text-gray-500 truncate">{address}</div> */}
           <div className="departure-time flex items-center justify-between text-gray-500">
             <div className="text-xs">Depart:</div>
             <input

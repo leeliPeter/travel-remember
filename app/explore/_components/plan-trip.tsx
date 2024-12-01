@@ -205,8 +205,8 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
           }}
         >
           {activeLocation ? (
-            <div className="bg-white shadow-xl rounded-lg p-2 w-64 transform-gpu scale-105 opacity-95">
-              <div className="font-medium text-blue-600 truncate">
+            <div className="bg-white shadow-xl rounded-lg p-2 w-full transform-gpu scale-105 opacity-95">
+              <div className="font-medium text-blue-600 text-sm truncate">
                 {activeLocation.name}
               </div>
               {activeLocation.photoUrl && (
