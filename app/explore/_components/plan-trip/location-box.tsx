@@ -21,6 +21,18 @@ export default function LocationBox({
   const [arrivalTime, setArrivalTime] = useState("00:00");
   const [departureTime, setDepartureTime] = useState("00:00");
 
+  const modifiedListeners = {
+    onPointerDown: (event: React.PointerEvent) => {
+      if (
+        event.target instanceof HTMLInputElement &&
+        event.target.type === "time"
+      ) {
+        return;
+      }
+      listeners?.onPointerDown?.(event);
+    },
+  };
+
   const {
     attributes,
     listeners,
@@ -60,7 +72,7 @@ export default function LocationBox({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
+      {...modifiedListeners}
       className="location-box w-full bg-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-move"
     >
       <div className="flex items-center h-24 flex-row p-2">
@@ -75,23 +87,24 @@ export default function LocationBox({
             />
           )}
         </div>
-        <div className="place-info text-xs flex flex-col  justify-between pl-1 space-y-1 w-2/3">
+        <div className="place-info text-xs flex flex-col justify-between pl-1 space-y-1 w-2/3">
           <div className="arrive-time flex items-center justify-between text-gray-500">
             <div className="text-xs">Arrive:</div>
             <input
               type="time"
               value={arrivalTime}
+              disabled={isDragging}
               onChange={(e) => setArrivalTime(e.target.value)}
-              className="text-sm  bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
+              className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
           <div className="place-name text-sm font-medium truncate">{name}</div>
-          {/* <div className="place-address text-gray-500 truncate">{address}</div> */}
           <div className="departure-time flex items-center justify-between text-gray-500">
             <div className="text-xs">Depart:</div>
             <input
               type="time"
               value={departureTime}
+              disabled={isDragging}
               onChange={(e) => setDepartureTime(e.target.value)}
               className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
             />
