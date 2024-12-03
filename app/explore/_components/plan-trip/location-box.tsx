@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 interface LocationBoxProps {
   id: string;
+  boxId: string;
   name: string;
   img: string | null;
   address: string;
@@ -16,6 +17,7 @@ interface LocationBoxProps {
 
 export default function LocationBox({
   id,
+  boxId,
   name,
   img,
   address,

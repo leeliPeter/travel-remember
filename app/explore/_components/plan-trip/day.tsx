@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Car, Footprints, Train } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 
 // Add libraries type
 const libraries: ("places" | "geometry" | "drawing" | "visualization")[] = [
@@ -171,6 +172,14 @@ export default function Day({ date, id, locations, onTimeChange }: DayProps) {
     onTimeChange?.(id, locationId, type, time);
   };
 
+  // Create a stable mapping of location IDs to UUIDs
+  const locationIdMap = React.useMemo(() => {
+    return locations.reduce((acc, location) => {
+      acc[location.id] = acc[location.id] || uuidv4();
+      return acc;
+    }, {} as Record<string, string>);
+  }, [locations]);
+
   return (
     <div
       ref={setNodeRef}
@@ -185,41 +194,46 @@ export default function Day({ date, id, locations, onTimeChange }: DayProps) {
           strategy={verticalListSortingStrategy}
         >
           <div className="space-y-2 transition-all pb-24 duration-300 ease-in-out">
-            {locations.map((location, index) => (
-              <div key={`${location.id}-${id}-${index}`}>
-                {index !== 0 && (
-                  <div className="w-full space-y-1 flex pb-1 flex-col items-center">
-                    <div className="p-0.5 bg-blue-200 rounded-full"></div>
-                    <div className="flex flex-col items-center ">
-                      <div className="commute-time">
-                        {locations[index - 1] && (
-                          <CommuteTime
-                            origin={locations[index - 1]}
-                            destination={location}
-                            googleMapsLoaded={isLoaded}
-                          />
-                        )}
+            {locations.map((location, index) => {
+              const locationBoxId = locationIdMap[location.id];
+
+              return (
+                <div key={locationBoxId}>
+                  {index !== 0 && (
+                    <div className="w-full space-y-1 flex pb-1 flex-col items-center">
+                      <div className="p-0.5 bg-blue-200 rounded-full"></div>
+                      <div className="flex flex-col items-center ">
+                        <div className="commute-time">
+                          {locations[index - 1] && (
+                            <CommuteTime
+                              origin={locations[index - 1]}
+                              destination={location}
+                              googleMapsLoaded={isLoaded}
+                            />
+                          )}
+                        </div>
                       </div>
+                      <div className="p-0.5 bg-blue-200 rounded-full"></div>
                     </div>
-                    <div className="p-0.5 bg-blue-200 rounded-full"></div>
+                  )}
+                  <div className="transition-all duration-300 ease-in-out">
+                    <LocationBox
+                      id={location.id}
+                      boxId={locationBoxId}
+                      dayId={id}
+                      name={location.name}
+                      img={location.photoUrl}
+                      address={location.address}
+                      arrivalTime={location.arrivalTime || "--:--"}
+                      departureTime={location.departureTime || "--:--"}
+                      onTimeChange={(type, time) =>
+                        handleTimeChange(location.id, type, time)
+                      }
+                    />
                   </div>
-                )}
-                <div className="transition-all duration-300 ease-in-out">
-                  <LocationBox
-                    id={location.id}
-                    dayId={id}
-                    name={location.name}
-                    img={location.photoUrl}
-                    address={location.address}
-                    arrivalTime={location.arrivalTime || "--:--"}
-                    departureTime={location.departureTime || "--:--"}
-                    onTimeChange={(type, time) =>
-                      handleTimeChange(location.id, type, time)
-                    }
-                  />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </SortableContext>
       </div>
