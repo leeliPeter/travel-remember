@@ -90,16 +90,16 @@ function CommuteTime({
   if (error) return <div className="text-black text-xs">{error}</div>;
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-1">
       <Select
         value={travelMode}
         onValueChange={(value) =>
           setTravelMode(value as google.maps.TravelMode)
         }
       >
-        <SelectTrigger className="w-[120px] h-6 text-xs">
+        <SelectTrigger className="w-[120px] h-5 text-xs">
           <SelectValue>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
               {travelMode === "DRIVING" && <Car className="w-4 h-4" />}
               {travelMode === "WALKING" && <Footprints className="w-4 h-4" />}
               {travelMode === "TRANSIT" && <Train className="w-4 h-4" />}
@@ -164,13 +164,13 @@ export default function Day({ date, id, locations }: DayProps) {
           items={locations.map((loc) => loc.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="space-y-2 transition-all duration-300 ease-in-out">
+          <div className="space-y-2 transition-all pb-24 duration-300 ease-in-out">
             {locations.map((location, index) => (
               <div key={`${location.id}-${id}-${index}`}>
                 {index !== 0 && (
-                  <div className="w-full space-y-1 flex pb-2 flex-col items-center">
+                  <div className="w-full space-y-1 flex pb-1 flex-col items-center">
                     <div className="p-0.5 bg-blue-200 rounded-full"></div>
-                    <div className="flex flex-col items-center gap-1">
+                    <div className="flex flex-col items-center ">
                       <div className="commute-time">
                         {locations[index - 1] && (
                           <CommuteTime
