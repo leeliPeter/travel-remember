@@ -9,6 +9,9 @@ interface LocationBoxProps {
   img: string | null;
   address: string;
   dayId: string;
+  arrivalTime?: string;
+  departureTime?: string;
+  onTimeChange?: (type: "arrival" | "departure", time: string) => void;
 }
 
 export default function LocationBox({
@@ -17,10 +20,26 @@ export default function LocationBox({
   img,
   address,
   dayId,
+  arrivalTime: initialArrivalTime = "24:00",
+  departureTime: initialDepartureTime = "24:00",
+  onTimeChange,
 }: LocationBoxProps) {
-  const [arrivalTime, setArrivalTime] = useState("00:00");
-  const [departureTime, setDepartureTime] = useState("00:00");
-  const [isInputActive, setIsInputActive] = useState(false);
+  const [arrivalTime, setArrivalTime] = useState(initialArrivalTime);
+  const [departureTime, setDepartureTime] = useState(initialDepartureTime);
+
+  const handleArrivalTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = e.target.value;
+    setArrivalTime(newTime);
+    onTimeChange?.("arrival", newTime);
+  };
+
+  const handleDepartureTimeChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newTime = e.target.value;
+    setDepartureTime(newTime);
+    onTimeChange?.("departure", newTime);
+  };
 
   const {
     attributes,
@@ -107,7 +126,7 @@ export default function LocationBox({
             <input
               type="time"
               value={arrivalTime}
-              onChange={(e) => setArrivalTime(e.target.value)}
+              onChange={handleArrivalTimeChange}
               className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
@@ -117,7 +136,7 @@ export default function LocationBox({
             <input
               type="time"
               value={departureTime}
-              onChange={(e) => setDepartureTime(e.target.value)}
+              onChange={handleDepartureTimeChange}
               className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>

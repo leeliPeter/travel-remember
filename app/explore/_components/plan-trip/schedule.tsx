@@ -8,7 +8,10 @@ import { DragEndEvent } from "@dnd-kit/core";
 interface DaySchedule {
   dayId: string;
   date: Date;
-  locations: Location[];
+  locations: (Location & {
+    arrivalTime?: string;
+    departureTime?: string;
+  })[];
 }
 
 const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
@@ -17,6 +20,34 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   // Add this function to generate a unique ID
   const generateUniqueId = () => {
     return `loc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  // Add function to handle time updates
+  const handleTimeUpdate = (
+    dayId: string,
+    locationId: string,
+    type: "arrival" | "departure",
+    time: string
+  ) => {
+    setDaySchedules((prevSchedules) =>
+      prevSchedules.map((schedule) => {
+        if (schedule.dayId === dayId) {
+          return {
+            ...schedule,
+            locations: schedule.locations.map((loc) => {
+              if (loc.id === locationId) {
+                return {
+                  ...loc,
+                  [type === "arrival" ? "arrivalTime" : "departureTime"]: time,
+                };
+              }
+              return loc;
+            }),
+          };
+        }
+        return schedule;
+      })
+    );
   };
 
   // Update handleLocationDrop
@@ -102,6 +133,8 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
               );
 
               if (oldIndex !== -1 && newIndex !== -1) {
+                // Preserve times when reordering
+                const movedLocation = dayLocations[oldIndex];
                 return {
                   ...schedule,
                   locations: arrayMove(dayLocations, oldIndex, newIndex),
@@ -124,12 +157,14 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           );
           if (!movedLocation) return prevSchedules;
 
-          // Create new location with unique ID
-          const newLocation: Location = {
+          // Create new location preserving times
+          const newLocation = {
             ...movedLocation,
             id: generateUniqueId(),
             createdAt: new Date(),
             updatedAt: new Date(),
+            arrivalTime: movedLocation.arrivalTime || "24:00",
+            departureTime: movedLocation.departureTime || "24:00",
           };
 
           // Check if target day exists
@@ -243,6 +278,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
                 day: "numeric",
               })}
               locations={daySchedule?.locations || []}
+              onTimeChange={handleTimeUpdate}
             />
           );
         })}

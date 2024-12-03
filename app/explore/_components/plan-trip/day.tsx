@@ -21,10 +21,21 @@ const libraries: ("places" | "geometry" | "drawing" | "visualization")[] = [
   "places",
 ];
 
+interface LocationWithTimes extends Location {
+  arrivalTime?: string;
+  departureTime?: string;
+}
+
 interface DayProps {
   date: string;
   id: string;
-  locations: Location[];
+  locations: LocationWithTimes[];
+  onTimeChange?: (
+    dayId: string,
+    locationId: string,
+    type: "arrival" | "departure",
+    time: string
+  ) => void;
 }
 
 // Move CommuteTime to a separate component to avoid re-renders
@@ -136,7 +147,7 @@ function CommuteTime({
   );
 }
 
-export default function Day({ date, id, locations }: DayProps) {
+export default function Day({ date, id, locations, onTimeChange }: DayProps) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
     libraries,
@@ -150,6 +161,15 @@ export default function Day({ date, id, locations }: DayProps) {
       locations,
     },
   });
+
+  const handleTimeChange = (
+    locationId: string,
+    type: "arrival" | "departure",
+    time: string
+  ) => {
+    // Pass the change up to Schedule component
+    onTimeChange?.(id, locationId, type, time);
+  };
 
   return (
     <div
@@ -191,6 +211,11 @@ export default function Day({ date, id, locations }: DayProps) {
                     name={location.name}
                     img={location.photoUrl}
                     address={location.address}
+                    arrivalTime={location.arrivalTime || "24:00"}
+                    departureTime={location.departureTime || "24:00"}
+                    onTimeChange={(type, time) =>
+                      handleTimeChange(location.id, type, time)
+                    }
                   />
                 </div>
               </div>

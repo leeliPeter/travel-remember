@@ -149,6 +149,8 @@ model Schedule {
   days        DaySchedule[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  status      String?       // e.g., "draft", "published"
+  version     Int          @default(1) // For tracking changes
 
   @@index([tripId])
 }
@@ -160,9 +162,12 @@ model DaySchedule {
   schedule    Schedule       @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
   plans       LocationPlan[]
   createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  updatedAt   DateTime      @updatedAt
+  dayOrder    Int           // To maintain day order
+  notes       String?       // Optional notes for the day
 
   @@index([scheduleId])
+  @@unique([scheduleId, dayOrder]) // Ensure unique order within schedule
 }
 
 model LocationPlan {
@@ -171,14 +176,18 @@ model LocationPlan {
   location      Location    @relation(fields: [locationId], references: [id])
   dayScheduleId String
   daySchedule   DaySchedule @relation(fields: [dayScheduleId], references: [id], onDelete: Cascade)
-  arrivalTime   DateTime
-  departureTime DateTime
+  arrivalTime   DateTime?   
+  departureTime DateTime?   
   commuteTime   Int?        // in minutes
+  planOrder     Int         // To maintain location order within day
+  notes         String?     // Optional notes for the location
+  status        String?     // e.g., "confirmed", "tentative"
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
   @@index([locationId])
   @@index([dayScheduleId])
+  @@unique([dayScheduleId, planOrder]) // Ensure unique order within day
 }
 
 
