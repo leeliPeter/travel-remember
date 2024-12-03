@@ -218,8 +218,8 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
               name={activeLocation.name}
               img={activeLocation.photoUrl}
               address={activeLocation.address}
-              arrivalTime={activeLocation.arrivalTime || "00:00"}
-              departureTime={activeLocation.departureTime || "00:00"}
+              arrivalTime={activeLocation.arrivalTime || "--:--"}
+              departureTime={activeLocation.departureTime || "--:--"}
             />
           )}
         </DragOverlay>

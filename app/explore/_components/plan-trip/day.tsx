@@ -211,8 +211,8 @@ export default function Day({ date, id, locations, onTimeChange }: DayProps) {
                     name={location.name}
                     img={location.photoUrl}
                     address={location.address}
-                    arrivalTime={location.arrivalTime || "24:00"}
-                    departureTime={location.departureTime || "24:00"}
+                    arrivalTime={location.arrivalTime || "--:--"}
+                    departureTime={location.departureTime || "--:--"}
                     onTimeChange={(type, time) =>
                       handleTimeChange(location.id, type, time)
                     }
