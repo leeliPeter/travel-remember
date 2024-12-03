@@ -117,7 +117,6 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
     handleReorder: (active: any, over: any) => {
       const sourceDayId = active.data.current.dayId;
       const targetDayId = over.data.current?.dayId;
-      const overId = over.data?.current?.id;
 
       if (sourceDayId === targetDayId) {
         // Handle reordering within same day
@@ -128,17 +127,29 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
               const oldIndex = dayLocations.findIndex(
                 (loc) => loc.id === active.id
               );
-              const newIndex = dayLocations.findIndex(
-                (loc) => loc.id === over.id
-              );
 
-              if (oldIndex !== -1 && newIndex !== -1) {
-                // Preserve times when reordering
-                const movedLocation = dayLocations[oldIndex];
-                return {
-                  ...schedule,
-                  locations: arrayMove(dayLocations, oldIndex, newIndex),
-                };
+              // If dropping over a location box, use its index
+              if (over.data.current?.type === "locationBox") {
+                const newIndex = dayLocations.findIndex(
+                  (loc) => loc.id === over.id
+                );
+
+                if (oldIndex !== -1 && newIndex !== -1) {
+                  return {
+                    ...schedule,
+                    locations: arrayMove(dayLocations, oldIndex, newIndex),
+                  };
+                }
+              } else {
+                // If dropping directly on the day (not over a location box)
+                // Move the item to the end
+                if (oldIndex !== -1) {
+                  const [movedItem] = dayLocations.splice(oldIndex, 1);
+                  return {
+                    ...schedule,
+                    locations: [...dayLocations, movedItem],
+                  };
+                }
               }
             }
             return schedule;
@@ -207,10 +218,10 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
             if (schedule.dayId === targetDayId) {
               const targetLocations = [...schedule.locations];
 
-              if (overId) {
+              if (over.data.current?.id) {
                 // Find the position to insert at
                 const overIndex = targetLocations.findIndex(
-                  (loc) => loc.id === overId
+                  (loc) => loc.id === over.data.current.id
                 );
                 if (overIndex !== -1) {
                   // Insert at specific position
