@@ -11,71 +11,6 @@ interface LocationBoxProps {
   dayId: string;
 }
 
-const LocationBoxContent = ({
-  name,
-  img,
-  address,
-  arrivalTime,
-  departureTime,
-  isDragging = false,
-}: {
-  name: string;
-  img: string | null;
-  address: string;
-  arrivalTime: string;
-  departureTime: string;
-  isDragging?: boolean;
-}) => (
-  <div className="flex items-center h-24 flex-row p-2">
-    <div className="place-img w-1/3 h-full">
-      {img && (
-        <Image
-          src={img}
-          alt={name}
-          className="w-full h-full rounded-lg object-cover"
-          width={100}
-          height={100}
-          priority={isDragging}
-          draggable={false}
-        />
-      )}
-    </div>
-    <div className="place-info text-xs flex flex-col justify-between pl-1 space-y-1 w-2/3">
-      <div className="arrive-time flex items-center justify-between text-gray-500">
-        <div className="text-xs">Arrive:</div>
-        {isDragging ? (
-          <div className="text-sm bg-white border border-gray-300 rounded-lg px-1">
-            {arrivalTime}
-          </div>
-        ) : (
-          <input
-            type="time"
-            value={arrivalTime}
-            onChange={() => {}}
-            className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
-          />
-        )}
-      </div>
-      <div className="place-name text-sm font-medium truncate">{name}</div>
-      <div className="departure-time flex items-center justify-between text-gray-500">
-        <div className="text-xs">Depart:</div>
-        {isDragging ? (
-          <div className="text-sm bg-white border border-gray-300 rounded-lg px-1">
-            {departureTime}
-          </div>
-        ) : (
-          <input
-            type="time"
-            value={departureTime}
-            onChange={() => {}}
-            className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
-          />
-        )}
-      </div>
-    </div>
-  </div>
-);
-
 export default function LocationBox({
   id,
   name,
@@ -85,6 +20,7 @@ export default function LocationBox({
 }: LocationBoxProps) {
   const [arrivalTime, setArrivalTime] = useState("00:00");
   const [departureTime, setDepartureTime] = useState("00:00");
+  const [isInputActive, setIsInputActive] = useState(false);
 
   const {
     attributes,
@@ -110,6 +46,16 @@ export default function LocationBox({
     },
   });
 
+  const modifiedListeners = {
+    ...listeners,
+    onPointerDown: (e: React.PointerEvent) => {
+      if (e.target instanceof HTMLInputElement) {
+        return;
+      }
+      listeners?.onPointerDown?.(e);
+    },
+  };
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)",
@@ -130,7 +76,7 @@ export default function LocationBox({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
+      {...modifiedListeners}
       className={`
         location-box w-full bg-gray-200 rounded-lg 
         transition-all duration-300 ease-in-out cursor-move
@@ -142,14 +88,41 @@ export default function LocationBox({
         ${isOver ? "ring-2 ring-blue-400 scale-[1.02]" : ""}
       `}
     >
-      <LocationBoxContent
-        name={name}
-        img={img}
-        address={address}
-        arrivalTime={arrivalTime}
-        departureTime={departureTime}
-        isDragging={isDragging}
-      />
+      <div className="flex items-center h-24 flex-row p-2">
+        <div className="place-img w-1/3 h-full">
+          {img && (
+            <Image
+              src={img}
+              alt={name}
+              className="w-full h-full rounded-lg object-cover"
+              width={100}
+              height={100}
+              draggable={false}
+            />
+          )}
+        </div>
+        <div className="place-info text-xs flex flex-col justify-between pl-1 space-y-1 w-2/3">
+          <div className="arrive-time flex items-center justify-between text-gray-500">
+            <div className="text-xs">Arrive:</div>
+            <input
+              type="time"
+              value={arrivalTime}
+              onChange={(e) => setArrivalTime(e.target.value)}
+              className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
+            />
+          </div>
+          <div className="place-name text-sm font-medium truncate">{name}</div>
+          <div className="departure-time flex items-center justify-between text-gray-500">
+            <div className="text-xs">Depart:</div>
+            <input
+              type="time"
+              value={departureTime}
+              onChange={(e) => setDepartureTime(e.target.value)}
+              className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -168,13 +141,35 @@ export const DraggingPreview = ({
   departureTime: string;
 }) => (
   <div className="w-[300px] bg-white rounded-lg shadow-xl ring-2 ring-blue-400 transform-gpu scale-105 opacity-95">
-    <LocationBoxContent
-      name={name}
-      img={img}
-      address={address}
-      arrivalTime={arrivalTime}
-      departureTime={departureTime}
-      isDragging={true}
-    />
+    <div className="flex items-center h-24 flex-row p-2">
+      <div className="place-img w-1/3 h-full">
+        {img && (
+          <Image
+            src={img}
+            alt={name}
+            className="w-full h-full rounded-lg object-cover"
+            width={100}
+            height={100}
+            draggable={false}
+            priority={true}
+          />
+        )}
+      </div>
+      <div className="place-info text-xs flex flex-col justify-between pl-1 space-y-1 w-2/3">
+        <div className="arrive-time flex items-center justify-between text-gray-500">
+          <div className="text-xs">Arrive:</div>
+          <div className="text-sm bg-white border border-gray-300 rounded-lg px-1">
+            {arrivalTime}
+          </div>
+        </div>
+        <div className="place-name text-sm font-medium truncate">{name}</div>
+        <div className="departure-time flex items-center justify-between text-gray-500">
+          <div className="text-xs">Depart:</div>
+          <div className="text-sm bg-white border border-gray-300 rounded-lg px-1">
+            {departureTime}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 );
