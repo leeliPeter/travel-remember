@@ -15,6 +15,13 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { DraggingPreview } from "./plan-trip/location-box";
+
+// Add interface for extended Location type
+interface ExtendedLocation extends Location {
+  arrivalTime?: string;
+  departureTime?: string;
+}
 
 interface ListWithLocations extends List {
   locations: Location[];
@@ -28,7 +35,9 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
     null
   );
   const scheduleRef = useRef<any>(null);
-  const [activeLocation, setActiveLocation] = useState<Location | null>(null);
+  const [activeLocation, setActiveLocation] = useState<ExtendedLocation | null>(
+    null
+  );
 
   const handleListClick = (list: ListWithLocations) => {
     setSelectedList(selectedList?.id === list.id ? null : list);
@@ -36,7 +45,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    setActiveLocation(active.data.current as Location);
+    setActiveLocation(active.data.current as ExtendedLocation);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -200,25 +209,19 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
         </div>
         <DragOverlay
           dropAnimation={{
-            duration: 0,
-            // easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+            duration: 300,
+            easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
           }}
         >
-          {activeLocation ? (
-            <div className="bg-white shadow-xl rounded-lg p-2 w-full transform-gpu scale-105 opacity-95">
-              <div className="font-medium text-blue-600 text-sm truncate">
-                {activeLocation.name}
-              </div>
-              {activeLocation.photoUrl && (
-                <img
-                  src={activeLocation.photoUrl}
-                  alt={activeLocation.name}
-                  className="w-full h-24 object-cover rounded-md mt-2"
-                  draggable={false}
-                />
-              )}
-            </div>
-          ) : null}
+          {activeLocation && (
+            <DraggingPreview
+              name={activeLocation.name}
+              img={activeLocation.photoUrl}
+              address={activeLocation.address}
+              arrivalTime={activeLocation.arrivalTime || "00:00"}
+              departureTime={activeLocation.departureTime || "00:00"}
+            />
+          )}
         </DragOverlay>
       </div>
     </DndContext>
