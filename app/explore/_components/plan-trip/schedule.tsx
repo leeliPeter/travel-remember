@@ -14,6 +14,7 @@ import { updateSchedule } from "@/actions/update-schedule";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RiSave3Line } from "react-icons/ri";
+import { getScheduleByTripId } from "@/data/get-scheduleby-tripId";
 
 interface DaySchedule {
   dayId: string;
@@ -56,7 +57,66 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   };
 
   // fetch daySchedules from database
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      if (!trip?.id) return;
+
+      const result = await getScheduleByTripId(trip.id);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      if (result.schedule?.scheduleData) {
+        const scheduleData = result.schedule.scheduleData as {
+          days: {
+            dayId: string;
+            date: string;
+            locations: {
+              id: string;
+              name: string;
+              address: string;
+              lat: number;
+              lng: number;
+              photoUrl?: string;
+              arrivalTime?: string;
+              departureTime?: string;
+              type: string;
+              createdAt: string;
+              updatedAt: string;
+            }[];
+          }[];
+        };
+
+        // Convert the schedule data to DaySchedule format
+        const convertedSchedule: DaySchedule[] = scheduleData.days.map(
+          (day) => ({
+            dayId: day.dayId,
+            date: new Date(day.date),
+            locations: day.locations.map((loc) => ({
+              id: loc.id,
+              name: loc.name,
+              address: loc.address,
+              lat: loc.lat,
+              lng: loc.lng,
+              photoUrl: loc.photoUrl || null,
+              listId: trip.id, // Using trip ID as listId since we don't need the original
+              createdAt: new Date(loc.createdAt),
+              updatedAt: new Date(loc.updatedAt),
+              arrivalTime: loc.arrivalTime,
+              departureTime: loc.departureTime,
+            })),
+          })
+        );
+
+        setDaySchedules(convertedSchedule);
+      }
+    };
+
+    fetchSchedule();
+  }, [trip?.id]);
+
   // Modified save function to handle pending changes
   const saveSchedule = async () => {
     if (isSaving || !trip.id) return;
@@ -89,17 +149,16 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
       });
 
       if (result.error) {
-        toast.error(result.error);
+        throw new Error(result.error);
       }
 
       // Check if there were any changes during saving
       if (pendingChangesRef.current) {
         pendingChangesRef.current = false;
-        // Trigger another save for pending changes
         debouncedSave();
       }
     } catch (error) {
-      toast.error("Failed to save schedule");
+      throw error;
     } finally {
       setIsSaving(false);
     }
@@ -388,14 +447,36 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
     new Date(trip.endDate)
   );
 
+  // Add a new function for manual save
+  const handleManualSave = async () => {
+    try {
+      await saveSchedule();
+      setIsEdited(false);
+      toast.success("Schedule saved successfully!", {
+        position: "bottom-right",
+        duration: 2000,
+        style: {
+          backgroundColor: "#10B981",
+          color: "white",
+        },
+      });
+    } catch (error) {
+      toast.error("Failed to save schedule", {
+        position: "bottom-right",
+        duration: 3000,
+        style: {
+          backgroundColor: "#EF4444",
+          color: "white",
+        },
+      });
+    }
+  };
+
   return (
     <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-3">
       <style jsx>{pulseAnimation}</style>
       <Button
-        onClick={() => {
-          saveSchedule();
-          setIsEdited(false);
-        }}
+        onClick={handleManualSave}
         className="absolute top-2 right-2 bg-sky-200 rounded-full p-4 h-auto w-auto"
       >
         <div className="reminder-container absolute top-0 right-4">

@@ -22,6 +22,15 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
 
     const { name, startDate, endDate, description } = validatedFields.data;
 
+    // Create initial schedule data
+    const initialScheduleData = {
+      days: getDatesInRange(startDate, endDate).map((date, index) => ({
+        dayId: `day-${index}`,
+        date: date.toISOString(),
+        locations: [],
+      })),
+    };
+
     // Create trip and schedule in a single transaction
     const trip = await db.trip.create({
       data: {
@@ -36,13 +45,7 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
         },
         schedule: {
           create: {
-            scheduleData: {
-              days: getDatesInRange(startDate, endDate).map((date, index) => ({
-                dayId: `day-${index}`,
-                date: date.toISOString(),
-                locations: [],
-              })),
-            },
+            scheduleData: initialScheduleData,
             version: 1,
           },
         },
