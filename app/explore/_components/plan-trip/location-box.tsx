@@ -2,6 +2,14 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface LocationBoxProps {
   id: string;
@@ -13,6 +21,90 @@ interface LocationBoxProps {
   arrivalTime?: string;
   departureTime?: string;
   onTimeChange?: (type: "arrival" | "departure", time: string) => void;
+}
+
+function TimePickerDialog({
+  isOpen,
+  onClose,
+  onSave,
+  initialTime,
+  title,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (time: string) => void;
+  initialTime: string;
+  title: string;
+}) {
+  const [selectedHour, setSelectedHour] = useState(initialTime.split(":")[0]);
+  const [selectedMinute, setSelectedMinute] = useState(
+    initialTime.split(":")[1]
+  );
+
+  const hours = Array.from({ length: 24 }, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+  const minutes = Array.from({ length: 60 }, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+
+  const handleSave = () => {
+    onSave(`${selectedHour}:${selectedMinute}`);
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
+            Select the time by choosing hour and minute
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-4 py-4">
+          <div className="flex flex-col items-center">
+            <label className="text-sm font-medium mb-2">Hour</label>
+            <div className="h-48 overflow-y-auto border rounded-lg">
+              {hours.map((hour) => (
+                <div
+                  key={hour}
+                  className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                    hour === selectedHour ? "bg-blue-100" : ""
+                  }`}
+                  onClick={() => setSelectedHour(hour)}
+                >
+                  {hour}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <label className="text-sm font-medium mb-2">Minute</label>
+            <div className="h-48 overflow-y-auto border rounded-lg">
+              {minutes.map((minute) => (
+                <div
+                  key={minute}
+                  className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                    minute === selectedMinute ? "bg-blue-100" : ""
+                  }`}
+                  onClick={() => setSelectedMinute(minute)}
+                >
+                  {minute}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave}>Save</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export default function LocationBox({
@@ -28,6 +120,8 @@ export default function LocationBox({
 }: LocationBoxProps) {
   const [arrivalTime, setArrivalTime] = useState(initialArrivalTime);
   const [departureTime, setDepartureTime] = useState(initialDepartureTime);
+  const [isArrivalDialogOpen, setIsArrivalDialogOpen] = useState(false);
+  const [isDepartureDialogOpen, setIsDepartureDialogOpen] = useState(false);
 
   const handleArrivalTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = e.target.value;
@@ -76,7 +170,11 @@ export default function LocationBox({
   const modifiedListeners = {
     ...listeners,
     onPointerDown: (e: React.PointerEvent) => {
-      if (e.target instanceof HTMLInputElement) {
+      if (
+        e.target instanceof HTMLButtonElement ||
+        e.target instanceof HTMLInputElement ||
+        (e.target as HTMLElement).closest('[role="dialog"]')
+      ) {
         return;
       }
       listeners?.onPointerDown?.(e);
@@ -131,27 +229,57 @@ export default function LocationBox({
         <div className="place-info text-xs flex flex-col justify-between pl-1 space-y-1 w-2/3">
           <div className="arrive-time flex items-center justify-between text-gray-500">
             <div className="text-xs">Arrive:</div>
-            <input
-              type="time"
-              value={arrivalTime}
-              onChange={handleArrivalTimeChange}
-              onKeyDown={handleKeyDown}
-              className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
-            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-sm h-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsArrivalDialogOpen(true);
+              }}
+            >
+              {arrivalTime}
+            </Button>
           </div>
           <div className="place-name text-sm font-medium truncate">{name}</div>
           <div className="departure-time flex items-center justify-between text-gray-500">
             <div className="text-xs">Depart:</div>
-            <input
-              type="time"
-              value={departureTime}
-              onChange={handleDepartureTimeChange}
-              onKeyDown={handleKeyDown}
-              className="text-sm bg-white border border-gray-300 rounded-lg px-1 focus:outline-none focus:border-blue-500 transition-colors"
-            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-sm h-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDepartureDialogOpen(true);
+              }}
+            >
+              {departureTime}
+            </Button>
           </div>
         </div>
       </div>
+
+      <TimePickerDialog
+        isOpen={isArrivalDialogOpen}
+        onClose={() => setIsArrivalDialogOpen(false)}
+        onSave={(time) => {
+          setArrivalTime(time);
+          onTimeChange?.("arrival", time);
+        }}
+        initialTime={arrivalTime}
+        title="Select Arrival Time"
+      />
+
+      <TimePickerDialog
+        isOpen={isDepartureDialogOpen}
+        onClose={() => setIsDepartureDialogOpen(false)}
+        onSave={(time) => {
+          setDepartureTime(time);
+          onTimeChange?.("departure", time);
+        }}
+        initialTime={departureTime}
+        title="Select Departure Time"
+      />
     </div>
   );
 }
@@ -159,8 +287,8 @@ export default function LocationBox({
 export const DraggingPreview = ({
   name,
   img,
-  arrivalTime,
-  departureTime,
+  arrivalTime = "--:--",
+  departureTime = "--:--",
 }: {
   name: string;
   img: string | null;
@@ -168,17 +296,14 @@ export const DraggingPreview = ({
   arrivalTime: string;
   departureTime: string;
 }) => {
-  // Convert time to 12-hour format
   const format12Hour = (time: string) => {
+    if (time === "--:--") return time;
+
     const [hours, minutes] = time.split(":");
-    if (time.includes("--")) return "--:--";
     let hoursNum = parseInt(hours);
     const ampm = hoursNum >= 12 ? "PM" : "AM";
 
-    // Convert 24 to 12
-    if (hoursNum === 24) hoursNum = 12;
-    // Convert to 12-hour format
-    else if (hoursNum > 12) hoursNum -= 12;
+    if (hoursNum > 12) hoursNum -= 12;
     else if (hoursNum === 0) hoursNum = 12;
 
     return `${hoursNum}:${minutes} ${ampm}`;

@@ -348,8 +348,8 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
             id: generateUniqueId(),
             createdAt: new Date(),
             updatedAt: new Date(),
-            arrivalTime: movedLocation.arrivalTime || "24:00",
-            departureTime: movedLocation.departureTime || "24:00",
+            arrivalTime: "--:--",
+            departureTime: "--:--",
           };
 
           // Check if target day exists
