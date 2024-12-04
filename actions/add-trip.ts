@@ -14,27 +14,15 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
   }
 
   try {
-    console.log("Received values:", values);
-
     const validatedFields = TripSchema.safeParse(values);
 
     if (!validatedFields.success) {
-      console.log("Validation errors:", validatedFields.error.errors);
-      return {
-        error: "Invalid fields!",
-        details: validatedFields.error.errors,
-      };
+      return { error: "Invalid fields!" };
     }
 
     const { name, startDate, endDate, description } = validatedFields.data;
 
-    console.log("Parsed data:", {
-      name,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      description,
-    });
-
+    // Create trip and schedule in a single transaction
     const trip = await db.trip.create({
       data: {
         name,
@@ -46,6 +34,18 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
             userId: user.id,
           },
         },
+        schedule: {
+          create: {
+            scheduleData: {
+              days: getDatesInRange(startDate, endDate).map((date, index) => ({
+                dayId: `day-${index}`,
+                date: date.toISOString(),
+                locations: [],
+              })),
+            },
+            version: 1,
+          },
+        },
       },
       include: {
         users: {
@@ -53,10 +53,11 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
             user: true,
           },
         },
+        schedule: true,
       },
     });
 
-    console.log("Trip created successfully:", trip);
+    console.log("Trip created successfully with schedule:", trip);
     revalidatePath("/mytrips");
     return { success: "Trip created!", trip };
   } catch (error) {
@@ -66,4 +67,18 @@ export async function addTrip(values: z.infer<typeof TripSchema>) {
     }
     return { error: "Something went wrong while creating the trip." };
   }
+}
+
+// Helper function to generate dates between start and end
+function getDatesInRange(startDate: Date, endDate: Date) {
+  const dates = [];
+  const currentDate = new Date(startDate);
+  const lastDate = new Date(endDate);
+
+  while (currentDate <= lastDate) {
+    dates.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dates;
 }

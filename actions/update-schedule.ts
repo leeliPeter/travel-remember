@@ -1,149 +1,91 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { auth } from "@/auth";
+import { currentUser } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
+import { ScheduleData } from "@/types/schedule";
 
-export interface LocationPlanInput {
-  locationId: string;
-  arrivalTime?: string | null;
-  departureTime?: string | null;
-  order: number;
-}
-
-export interface DayScheduleInput {
-  date: Date;
-  order: number;
-  locations: LocationPlanInput[];
-}
-
-export interface UpdateScheduleParams {
+interface UpdateScheduleParams {
   tripId: string;
-  days: DayScheduleInput[];
+  scheduleData: ScheduleData;
 }
 
-export async function updateSchedule(params: UpdateScheduleParams) {
-  // Log incoming data for debugging
-  console.log("Received params:", JSON.stringify(params, null, 2));
-
-  // Initial validation
-  if (!params) {
-    console.error("Params is null or undefined");
-    return { error: "No data provided" };
-  }
-
-  if (typeof params !== "object") {
-    console.error("Params is not an object:", typeof params);
-    return { error: "Invalid data format" };
-  }
-
+export async function updateSchedule({
+  tripId,
+  scheduleData,
+}: UpdateScheduleParams) {
   try {
-    const session = await auth();
+    const user = await currentUser();
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return { error: "Unauthorized" };
     }
 
-    // Validate required fields
-    if (!params.tripId) {
-      console.error("Missing tripId");
-      return { error: "Trip ID is required" };
-    }
-
-    if (!Array.isArray(params.days)) {
-      console.error("Days is not an array");
-      return { error: "Invalid days format" };
-    }
-
-    // Validate days structure
-    for (const day of params.days) {
-      if (!day.date || !(day.date instanceof Date)) {
-        console.error("Invalid date in day:", day);
-        return { error: "Invalid date format" };
-      }
-
-      if (!Array.isArray(day.locations)) {
-        console.error("Locations is not an array in day:", day);
-        return { error: "Invalid locations format" };
-      }
-
-      for (const loc of day.locations) {
-        if (!loc.locationId || typeof loc.locationId !== "string") {
-          console.error("Invalid location:", loc);
-          return { error: "Invalid location data" };
-        }
-      }
-    }
-
-    // Create schedule with validated data
-    const schedule = await db.schedule.upsert({
+    // Verify user has access to this trip
+    const trip = await db.trip.findFirst({
       where: {
-        tripId: params.tripId,
-      },
-      create: {
-        tripId: params.tripId,
-        days: {
-          create: params.days.map((day) => ({
-            date: new Date(day.date),
-            order: day.order,
-            locationPlans: {
-              create: day.locations.map((loc) => ({
-                location: {
-                  connect: {
-                    id: loc.locationId.startsWith("loc_")
-                      ? loc.locationId.split("_")[2]
-                      : loc.locationId,
-                  },
-                },
-                arrivalTime: loc.arrivalTime || null,
-                departureTime: loc.departureTime || null,
-                order: loc.order,
-              })),
-            },
-          })),
-        },
-      },
-      update: {
-        days: {
-          deleteMany: {},
-          create: params.days.map((day) => ({
-            date: new Date(day.date),
-            order: day.order,
-            locationPlans: {
-              create: day.locations.map((loc) => ({
-                location: {
-                  connect: {
-                    id: loc.locationId.startsWith("loc_")
-                      ? loc.locationId.split("_")[2]
-                      : loc.locationId,
-                  },
-                },
-                arrivalTime: loc.arrivalTime || null,
-                departureTime: loc.departureTime || null,
-                order: loc.order,
-              })),
-            },
-          })),
+        id: tripId,
+        users: {
+          some: {
+            userId: user.id,
+          },
         },
       },
       include: {
-        days: {
-          include: {
-            locationPlans: {
-              include: {
-                location: true,
-              },
-            },
-          },
-          orderBy: {
-            order: "asc",
-          },
+        schedule: true,
+      },
+    });
+
+    if (!trip) {
+      return { error: "Trip not found or access denied" };
+    }
+
+    // Convert scheduleData to a plain object for Prisma JSON field
+    const scheduleDataJson = {
+      days: scheduleData.days.map((day) => ({
+        dayId: day.dayId,
+        date: day.date,
+        locations: day.locations.map((loc) => ({
+          id: loc.id,
+          name: loc.name,
+          address: loc.address,
+          lat: loc.lat,
+          lng: loc.lng,
+          photoUrl: loc.photoUrl,
+          arrivalTime: loc.arrivalTime,
+          departureTime: loc.departureTime,
+          type: loc.type,
+          createdAt: loc.createdAt,
+          updatedAt: loc.updatedAt,
+        })),
+      })),
+    };
+
+    // Update or create schedule
+    const updatedSchedule = await db.schedule.upsert({
+      where: {
+        tripId: tripId,
+      },
+      create: {
+        tripId: tripId,
+        scheduleData: scheduleDataJson,
+        version: 1,
+      },
+      update: {
+        scheduleData: scheduleDataJson,
+        version: {
+          increment: 1,
         },
       },
     });
 
-    return { success: "Schedule updated successfully", schedule };
+    revalidatePath("/explore");
+    return {
+      success: "Schedule updated successfully",
+      schedule: updatedSchedule,
+    };
   } catch (error) {
     console.error("[UPDATE_SCHEDULE_ERROR]", error);
-    return { error: "Something went wrong" };
+    return { error: "Failed to update schedule" };
   }
 }

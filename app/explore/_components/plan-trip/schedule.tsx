@@ -1,10 +1,20 @@
 "use client";
 
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useEffect,
+} from "react";
 import Day from "./day";
 import { Trip, Location } from "@prisma/client";
 import { arrayMove } from "@dnd-kit/sortable";
-import { DragEndEvent } from "@dnd-kit/core";
+import { updateSchedule } from "@/actions/update-schedule";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { RiSave3Line } from "react-icons/ri";
+
 interface DaySchedule {
   dayId: string;
   date: Date;
@@ -14,15 +24,103 @@ interface DaySchedule {
   })[];
 }
 
+const pulseAnimation = `
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+    
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+  }
+`;
+
 const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
+  const [isEdited, setIsEdited] = useState(false);
   const [daySchedules, setDaySchedules] = useState<DaySchedule[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const pendingChangesRef = useRef(false);
 
   // Add this function to generate a unique ID
   const generateUniqueId = () => {
     return `loc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   };
 
-  // Add function to handle time updates
+  // fetch daySchedules from database
+  useEffect(() => {}, []);
+  // Modified save function to handle pending changes
+  const saveSchedule = async () => {
+    if (isSaving || !trip.id) return;
+
+    try {
+      setIsSaving(true);
+      const scheduleData = {
+        days: daySchedules.map((day) => ({
+          dayId: day.dayId,
+          date: day.date.toISOString(),
+          locations: day.locations.map((loc) => ({
+            id: loc.id,
+            name: loc.name,
+            address: loc.address,
+            lat: loc.lat,
+            lng: loc.lng,
+            photoUrl: loc.photoUrl || undefined,
+            arrivalTime: loc.arrivalTime,
+            departureTime: loc.departureTime,
+            type: "location",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          })),
+        })),
+      };
+
+      const result = await updateSchedule({
+        tripId: trip.id,
+        scheduleData: scheduleData,
+      });
+
+      if (result.error) {
+        toast.error(result.error);
+      }
+
+      // Check if there were any changes during saving
+      if (pendingChangesRef.current) {
+        pendingChangesRef.current = false;
+        // Trigger another save for pending changes
+        debouncedSave();
+      }
+    } catch (error) {
+      toast.error("Failed to save schedule");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Modified debounced save handler
+  const debouncedSave = () => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    if (isSaving) {
+      // Mark that we have pending changes
+      pendingChangesRef.current = true;
+      return;
+    }
+
+    saveTimeoutRef.current = setTimeout(saveSchedule, 500); // Reduced timeout
+  };
+
+  // Update handleTimeUpdate
   const handleTimeUpdate = (
     dayId: string,
     locationId: string,
@@ -48,11 +146,23 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
         return schedule;
       })
     );
+
+    setIsEdited(true);
+    debouncedSave();
   };
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Update handleLocationDrop
   useImperativeHandle(ref, () => ({
-    handleLocationDrop: (
+    handleLocationDrop: async (
       dayId: string,
       location: Location,
       overId?: string
@@ -113,8 +223,12 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           ];
         }
       });
+
+      // After updating state, save to database
+      await saveSchedule();
+      setIsEdited(true);
     },
-    handleReorder: (active: any, over: any) => {
+    handleReorder: async (active: any, over: any) => {
       const sourceDayId = active.data.current.dayId;
       const targetDayId = over.data.current?.dayId;
 
@@ -155,6 +269,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
             return schedule;
           });
         });
+        setIsEdited(true);
       } else {
         // Handle moving between days
         setDaySchedules((prevSchedules) => {
@@ -242,6 +357,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
             return schedule;
           });
         });
+        setIsEdited(true);
       }
     },
   }));
@@ -273,7 +389,31 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   );
 
   return (
-    <div className="w-full h-full overflow-x-auto bg-gray-100/70 p-3">
+    <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-3">
+      <style jsx>{pulseAnimation}</style>
+      <Button
+        onClick={() => {
+          saveSchedule();
+          setIsEdited(false);
+        }}
+        className="absolute top-2 right-2 bg-sky-200 rounded-full p-4 h-auto w-auto"
+      >
+        <div className="reminder-container absolute top-0 right-4">
+          {isEdited && (
+            <div
+              className="reminder-dot absolute  h-4 z-10 w-4 bg-red-500 rounded-full"
+              style={{
+                animation: "pulse 0.5s infinite",
+                transformOrigin: "center",
+              }}
+            />
+          )}
+        </div>
+        <RiSave3Line
+          className="h-12 w-12 text-sky-500 hover:text-sky-100"
+          style={{ transform: "scale(2.0)" }}
+        />
+      </Button>
       <div className="flex h-full space-x-4 min-w-fit">
         {tripDates.map((date, index) => {
           const dayId = `day-${index}`;

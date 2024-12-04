@@ -113,17 +113,16 @@ model List {
 }
 
 model Location {
-  id            String         @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String
   address       String
   lat           Float
   lng           Float
   photoUrl      String?
   listId        String
-  list          List          @relation(fields: [listId], references: [id], onDelete: Cascade)
-  locationPlans LocationPlan[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  list          List      @relation(fields: [listId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([listId])
 }
@@ -143,54 +142,36 @@ model UserTrip {
 }
 
 model Schedule {
-  id          String        @id @default(cuid())
-  tripId      String        @unique
-  trip        Trip          @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  days        DaySchedule[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  status      String?       // e.g., "draft", "published"
-  version     Int          @default(1) // For tracking changes
+  id          String    @id @default(cuid())
+  tripId      String    @unique
+  trip        Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  // scheduleData JSON structure:
+  // {
+  //   days: [{
+  //     dayId: string,        // e.g., "day-0"
+  //     date: string,         // ISO date string
+  //     locations: [{
+  //       id: string,         // e.g., "loc_1733277039578_6xnly489y"
+  //       name: string,       // e.g., "Erziping Recreation Area"
+  //       address: string,    // e.g., "251, Taiwan, New Taipei City..."
+  //       lat: number,        // e.g., 25.1780252
+  //       lng: number,        // e.g., 121.5142645
+  //       photoUrl?: string,  // Optional photo URL
+  //       arrivalTime?: string, // e.g., "14:31"
+  //       departureTime?: string, // e.g., "12:22"
+  //       type: string,      // e.g., "location"
+  //       createdAt: string, // ISO date string
+  //       updatedAt: string  // ISO date string
+  //     }]
+  //   }]
+  // }
+  scheduleData Json
+  version     Int      @default(1)  // For tracking changes
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([tripId])
 }
-
-model DaySchedule {
-  id          String         @id @default(cuid())
-  date        DateTime
-  scheduleId  String
-  schedule    Schedule       @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
-  plans       LocationPlan[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime      @updatedAt
-  dayOrder    Int           // To maintain day order
-  notes       String?       // Optional notes for the day
-
-  @@index([scheduleId])
-  @@unique([scheduleId, dayOrder]) // Ensure unique order within schedule
-}
-
-model LocationPlan {
-  id            String      @id @default(cuid())
-  locationId    String
-  location      Location    @relation(fields: [locationId], references: [id])
-  dayScheduleId String
-  daySchedule   DaySchedule @relation(fields: [dayScheduleId], references: [id], onDelete: Cascade)
-  arrivalTime   DateTime?   
-  departureTime DateTime?   
-  commuteTime   Int?        // in minutes
-  planOrder     Int         // To maintain location order within day
-  notes         String?     // Optional notes for the location
-  status        String?     // e.g., "confirmed", "tentative"
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@index([locationId])
-  @@index([dayScheduleId])
-  @@unique([dayScheduleId, planOrder]) // Ensure unique order within day
-}
-
-
 
 
 
