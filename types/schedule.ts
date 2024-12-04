@@ -7,6 +7,7 @@ export interface ScheduleLocation {
   photoUrl?: string;
   arrivalTime?: string;
   departureTime?: string;
+  wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
   type: string;
   createdAt: string;
   updatedAt: string;

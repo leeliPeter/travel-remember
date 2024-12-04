@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import LocationBox from "./location-box";
 import { useDroppable } from "@dnd-kit/core";
 import { Location } from "@prisma/client";
@@ -22,20 +22,24 @@ const libraries: ("places" | "geometry" | "drawing" | "visualization")[] = [
   "places",
 ];
 
-interface LocationWithTimes extends Location {
-  arrivalTime?: string;
-  departureTime?: string;
-}
-
 interface DayProps {
   date: string;
   id: string;
-  locations: LocationWithTimes[];
+  locations: (Location & {
+    arrivalTime?: string;
+    departureTime?: string;
+    wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
+  })[];
   onTimeChange?: (
     dayId: string,
     locationId: string,
     type: "arrival" | "departure",
     time: string
+  ) => void;
+  onWayToCommuteChange?: (
+    dayId: string,
+    locationId: string,
+    wayToCommute: "DRIVING" | "WALKING" | "TRANSIT"
   ) => void;
 }
 
@@ -44,15 +48,28 @@ function CommuteTime({
   origin,
   destination,
   googleMapsLoaded,
+  onWayToCommuteChange,
 }: {
-  origin: Location;
-  destination: Location;
+  origin: Location & { wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT" };
+  destination: Location & { wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT" };
   googleMapsLoaded: boolean;
+  onWayToCommuteChange?: (
+    wayToCommute: "DRIVING" | "WALKING" | "TRANSIT"
+  ) => void;
 }) {
   const [commuteTime, setCommuteTime] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [travelMode, setTravelMode] = React.useState<google.maps.TravelMode>(
-    window.google.maps.TravelMode.DRIVING
+    () => {
+      switch (destination.wayToCommute) {
+        case "WALKING":
+          return window.google.maps.TravelMode.WALKING;
+        case "TRANSIT":
+          return window.google.maps.TravelMode.TRANSIT;
+        default:
+          return window.google.maps.TravelMode.DRIVING;
+      }
+    }
   );
 
   React.useEffect(() => {
@@ -105,9 +122,23 @@ function CommuteTime({
     <div className="flex flex-col items-center gap-1">
       <Select
         value={travelMode}
-        onValueChange={(value) =>
-          setTravelMode(value as google.maps.TravelMode)
-        }
+        onValueChange={(value) => {
+          const newMode = value as google.maps.TravelMode;
+          setTravelMode(newMode);
+
+          // Convert and pass up to parent
+          let wayToCommute: "DRIVING" | "WALKING" | "TRANSIT" = "DRIVING";
+          switch (newMode) {
+            case window.google.maps.TravelMode.WALKING:
+              wayToCommute = "WALKING";
+              break;
+            case window.google.maps.TravelMode.TRANSIT:
+              wayToCommute = "TRANSIT";
+              break;
+          }
+
+          onWayToCommuteChange?.(wayToCommute);
+        }}
       >
         <SelectTrigger className="w-[120px] h-5 text-xs">
           <SelectValue>
@@ -148,7 +179,13 @@ function CommuteTime({
   );
 }
 
-export default function Day({ date, id, locations, onTimeChange }: DayProps) {
+export default function Day({
+  date,
+  id,
+  locations,
+  onTimeChange,
+  onWayToCommuteChange,
+}: DayProps) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
     libraries,
@@ -209,6 +246,13 @@ export default function Day({ date, id, locations, onTimeChange }: DayProps) {
                               origin={locations[index - 1]}
                               destination={location}
                               googleMapsLoaded={isLoaded}
+                              onWayToCommuteChange={(wayToCommute) =>
+                                onWayToCommuteChange?.(
+                                  id,
+                                  location.id,
+                                  wayToCommute
+                                )
+                              }
                             />
                           )}
                         </div>

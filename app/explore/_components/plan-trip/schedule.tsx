@@ -22,6 +22,7 @@ interface DaySchedule {
   locations: (Location & {
     arrivalTime?: string;
     departureTime?: string;
+    wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
   })[];
 }
 
@@ -85,6 +86,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
               type: string;
               createdAt: string;
               updatedAt: string;
+              wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
             }[];
           }[];
         };
@@ -106,6 +108,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
               updatedAt: new Date(loc.updatedAt),
               arrivalTime: loc.arrivalTime,
               departureTime: loc.departureTime,
+              wayToCommute: loc.wayToCommute || "DRIVING",
             })),
           })
         );
@@ -139,6 +142,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
             type: "location",
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            wayToCommute: loc.wayToCommute || "DRIVING",
           })),
         })),
       };
@@ -196,6 +200,36 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
                 return {
                   ...loc,
                   [type === "arrival" ? "arrivalTime" : "departureTime"]: time,
+                };
+              }
+              return loc;
+            }),
+          };
+        }
+        return schedule;
+      })
+    );
+
+    setIsEdited(true);
+    debouncedSave();
+  };
+
+  // Add handleWayToCommuteChange function
+  const handleWayToCommuteChange = (
+    dayId: string,
+    locationId: string,
+    wayToCommute: "DRIVING" | "WALKING" | "TRANSIT"
+  ) => {
+    setDaySchedules((prevSchedules) =>
+      prevSchedules.map((schedule) => {
+        if (schedule.dayId === dayId) {
+          return {
+            ...schedule,
+            locations: schedule.locations.map((loc) => {
+              if (loc.id === locationId) {
+                return {
+                  ...loc,
+                  wayToCommute,
                 };
               }
               return loc;
@@ -511,6 +545,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
               })}
               locations={daySchedule?.locations || []}
               onTimeChange={handleTimeUpdate}
+              onWayToCommuteChange={handleWayToCommuteChange}
             />
           );
         })}

@@ -54,6 +54,7 @@ export async function updateSchedule({
           photoUrl: loc.photoUrl,
           arrivalTime: loc.arrivalTime,
           departureTime: loc.departureTime,
+          wayToCommute: loc.wayToCommute || "DRIVING",
           type: loc.type,
           createdAt: loc.createdAt,
           updatedAt: loc.updatedAt,

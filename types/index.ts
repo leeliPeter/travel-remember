@@ -10,6 +10,7 @@ export interface ScheduleResponse {
         address: string;
         lat: number;
         lng: number;
+        wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
         photoUrl?: string;
         arrivalTime?: string;
         departureTime?: string;
@@ -22,4 +23,12 @@ export interface ScheduleResponse {
   version: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface LocationToAdd {
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  photoUrl?: string | null;
 }

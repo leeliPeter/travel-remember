@@ -34,19 +34,6 @@ export async function addLocationToList(
       return { error: "List not found or access denied" };
     }
 
-    // Check if location already exists in this list
-    const existingLocation = await db.location.findFirst({
-      where: {
-        listId,
-        lat: location.lat,
-        lng: location.lng,
-      },
-    });
-
-    if (existingLocation) {
-      return { error: "Location already exists in this list" };
-    }
-
     // Add location to the list
     const newLocation = await db.location.create({
       data: {
@@ -60,10 +47,7 @@ export async function addLocationToList(
     });
 
     revalidatePath("/explore");
-    return {
-      success: "Location added to list",
-      location: newLocation,
-    };
+    return { success: "Location added to list", location: newLocation };
   } catch (error) {
     console.error("[ADD_LOCATION_TO_LIST]", error);
     return { error: "Failed to add location to list" };
