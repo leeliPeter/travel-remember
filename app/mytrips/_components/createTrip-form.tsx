@@ -42,7 +42,6 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
   });
 
   const handleSubmit = async (formData: z.infer<typeof TripSchema>) => {
-    console.log("Received form data:", formData);
     setError("");
     setSuccess("");
 
@@ -57,8 +56,8 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
           ? formData.endDate
           : new Date(formData.endDate),
     };
-
-    console.log("Formatted data:", data);
+    console.log("start date", data.startDate);
+    console.log("end date", data.endDate);
 
     startTransition(async () => {
       const response = await addTrip(data);
@@ -125,7 +124,11 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
                         ? field.value.toISOString().split("T")[0]
                         : ""
                     }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    onChange={(e) => {
+                      const date = new Date(e.target.value);
+                      date.setUTCHours(12, 0, 0, 0);
+                      field.onChange(date);
+                    }}
                     disabled={loading}
                     className="h-9 sm:h-10"
                   />
@@ -150,7 +153,11 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
                         ? field.value.toISOString().split("T")[0]
                         : ""
                     }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    onChange={(e) => {
+                      const date = new Date(e.target.value);
+                      date.setUTCHours(12, 0, 0, 0);
+                      field.onChange(date);
+                    }}
                     disabled={loading}
                     className="h-9 sm:h-10"
                   />

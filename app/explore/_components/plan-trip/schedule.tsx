@@ -465,11 +465,18 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
 
   const getDatesInRange = (startDate: Date, endDate: Date) => {
     const dates = [];
+    // Create new dates and set to noon UTC
     const currentDate = new Date(startDate);
+    currentDate.setUTCHours(12, 0, 0, 0);
+
     const lastDate = new Date(endDate);
+    lastDate.setUTCHours(12, 0, 0, 0);
 
     while (currentDate <= lastDate) {
-      dates.push(new Date(currentDate));
+      // Create a new date object for each day to avoid reference issues
+      const date = new Date(currentDate);
+      date.setUTCHours(12, 0, 0, 0);
+      dates.push(date);
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
