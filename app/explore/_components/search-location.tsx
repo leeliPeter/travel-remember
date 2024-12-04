@@ -350,6 +350,11 @@ export default function SearchLocation() {
                                   src={location.photoUrl}
                                   alt={location.name}
                                   className="w-full hidden xl:block h-16 sm:h-24 object-cover rounded-md mt-2"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.onerror = null; // Prevent infinite loop
+                                    target.src = "/images/emptyImage.jpg";
+                                  }}
                                 />
                               )}
                             </div>

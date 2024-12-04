@@ -14,7 +14,6 @@ import {
   useDraggable,
   DragOverlay,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 import { DraggingPreview } from "./plan-trip/location-box";
 
 // Add interface for extended Location type

@@ -49,7 +49,6 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
   const searchBoxRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [isAddingLocation, setIsAddingLocation] = useState(false);
   const currentPlaceRef = useRef<google.maps.places.PlaceResult | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setIsBrowser(true);
@@ -60,70 +59,6 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
     libraries,
   });
 
-  const createInfoWindowContent = (place: google.maps.places.PlaceResult) => {
-    const photoUrl = place.photos?.[0]?.getUrl();
-
-    return `
-      <div class="p-4 max-w-[300px]">
-        <div class="flex flex-col space-y-4">
-          <div class="relative w-full" id="dropdownContainer">
-            <button
-              id="addToListBtn"
-              class="w-full px-4 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-              Add to List
-            </button>
-            
-            <div id="listSelectContainer" class="hidden absolute top-full left-0 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-              ${
-                lists.length > 0
-                  ? `<div class="py-1">
-                      ${lists
-                        .map(
-                          (list) => `
-                        <button
-                          class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex justify-between items-center group"
-                          data-list-id="${list.id}"
-                        >
-                          <span class="font-medium">${list.name}</span>
-                          <span class="text-gray-400 text-xs">${list.locations.length} locations</span>
-                        </button>
-                      `
-                        )
-                        .join("")}
-                    </div>`
-                  : `<div class="px-4 py-2 text-sm text-gray-500">No lists available</div>`
-              }
-            </div>
-          </div>
-
-          ${
-            photoUrl
-              ? `<div class="mb-2">
-                  <img 
-                    src="${photoUrl}" 
-                    alt="${place.name || ""}"
-                    class="w-full h-48 object-cover rounded-lg"
-                  />
-                </div>`
-              : ""
-          }
-          
-          <div class="text-lg font-bold text-blue-500">
-            ${place.name || ""}
-          </div>
-          
-          <div class="text-sm text-gray-600">
-            ${place.formatted_address || ""}
-          </div>
-        </div>
-      </div>
-    `;
-  };
-
   const handleAddToList = async (
     listId: string,
     place: google.maps.places.PlaceResult
@@ -132,12 +67,24 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
 
     setIsAddingLocation(true);
     try {
+      let photoUrl = null;
+      try {
+        photoUrl =
+          place.photos?.[0]?.getUrl({
+            maxWidth: 400,
+            maxHeight: 300,
+          }) || "/images/emptyImage.jpg";
+      } catch (error) {
+        console.error("Error getting photo URL:", error);
+        photoUrl = "/images/emptyImage.jpg";
+      }
+
       const locationData = {
         name: place.name || "",
         address: place.formatted_address || "",
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
-        photoUrl: place.photos?.[0]?.getUrl() || null,
+        photoUrl: photoUrl,
         listId: listId,
       };
 
@@ -157,11 +104,16 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
         toast.success(
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              {place.photos?.[0]?.getUrl() && (
+              {photoUrl && (
                 <img
-                  src={place.photos[0].getUrl()}
+                  src={photoUrl}
                   alt={place.name || ""}
                   className="w-10 h-10 rounded-md object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null; // Prevent infinite loop
+                    target.src = "/images/emptyImage.jpg";
+                  }}
                 />
               )}
             </div>
@@ -195,51 +147,6 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
     }
   };
 
-  const setupInfoWindowListeners = (place: google.maps.places.PlaceResult) => {
-    const addButton = document.getElementById("addToListBtn");
-    const listSelectContainer = document.getElementById("listSelectContainer");
-    const dropdownContainer = document.getElementById("dropdownContainer");
-
-    if (addButton && listSelectContainer && dropdownContainer) {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          dropdownContainer &&
-          !dropdownContainer.contains(event.target as Node)
-        ) {
-          listSelectContainer.classList.add("hidden");
-        }
-      };
-
-      // Toggle dropdown
-      addButton.addEventListener("click", () => {
-        if (!isAddingLocation) {
-          listSelectContainer.classList.toggle("hidden");
-        }
-      });
-
-      // Add click handlers for list items
-      const listButtons =
-        listSelectContainer.querySelectorAll("[data-list-id]");
-      listButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const listId = button.getAttribute("data-list-id");
-          if (listId) {
-            handleAddToList(listId, place);
-            listSelectContainer.classList.add("hidden");
-          }
-        });
-      });
-
-      // Add click outside listener
-      document.addEventListener("click", handleClickOutside);
-
-      // Clean up function
-      return () => {
-        document.removeEventListener("click", handleClickOutside);
-      };
-    }
-  };
-
   const handlePlaceSelect = (placeId: string, map: google.maps.Map) => {
     const service = new google.maps.places.PlacesService(map);
     service.getDetails(
@@ -268,10 +175,17 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
 
           const content = document.createElement("div");
           content.className = "custom-info-window";
-          const photoUrl = place.photos?.[0]?.getUrl({
-            maxWidth: 260,
-            maxHeight: 180,
-          });
+
+          let photoUrl = null;
+          try {
+            photoUrl = place.photos?.[0]?.getUrl({
+              maxWidth: 400,
+              maxHeight: 300,
+            });
+          } catch (error) {
+            console.error("Error getting photo URL:", error);
+            photoUrl = "/images/emptyImage.jpg";
+          }
 
           content.innerHTML = `
             <div class="p-0 min-w-[170px] max-w-[260px]">
@@ -297,7 +211,6 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
                                   data-list-id="${list.id}"
                                 >
                                   <span class="font-medium">${list.name}</span>
-                                  <span class="text-gray-400 text-xs">${list.locations.length} locations</span>
                                 </button>
                               `
                               )
@@ -312,9 +225,10 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
                   photoUrl
                     ? `<div class="mb-2">
                         <img 
-                          src="${photoUrl}" 
+                          src="${photoUrl}"
                           alt="${place.name || ""}"
                           class="w-full h-48 object-cover rounded-lg"
+                          onerror="this.onerror=null; this.src='/images/emptyImage.jpg';"
                         />
                       </div>`
                     : ""

@@ -514,11 +514,11 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   };
 
   return (
-    <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-3">
+    <div className="relative w-full h-full">
       <style jsx>{pulseAnimation}</style>
       <Button
         onClick={handleManualSave}
-        className="absolute top-2 right-2 bg-sky-200 rounded-full p-4 h-auto w-auto"
+        className="absolute top-2 right-2 z-20 bg-sky-200 rounded-full p-4 h-auto w-auto"
       >
         <div className="reminder-container absolute top-0 right-4">
           {isEdited && (
@@ -536,26 +536,28 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           style={{ transform: "scale(2.0)" }}
         />
       </Button>
-      <div className="flex h-full space-x-4 min-w-fit">
-        {tripDates.map((date, index) => {
-          const dayId = `day-${index}`;
-          const daySchedule = daySchedules.find((s) => s.dayId === dayId);
+      <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-3">
+        <div className="flex h-full space-x-4 min-w-fit">
+          {tripDates.map((date, index) => {
+            const dayId = `day-${index}`;
+            const daySchedule = daySchedules.find((s) => s.dayId === dayId);
 
-          return (
-            <Day
-              key={dayId}
-              id={dayId}
-              date={date.toLocaleDateString("en-US", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}
-              locations={daySchedule?.locations || []}
-              onTimeChange={handleTimeUpdate}
-              onWayToCommuteChange={handleWayToCommuteChange}
-            />
-          );
-        })}
+            return (
+              <Day
+                key={dayId}
+                id={dayId}
+                date={date.toLocaleDateString("en-US", {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}
+                locations={daySchedule?.locations || []}
+                onTimeChange={handleTimeUpdate}
+                onWayToCommuteChange={handleWayToCommuteChange}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );
