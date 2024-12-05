@@ -2,7 +2,6 @@
 import * as z from "zod";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
 import { UpdateUserInfoSchema } from "@/schemas";
 import { getUserById } from "@/data/user";
 
