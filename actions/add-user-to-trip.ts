@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 export interface AddUserResponse {
   success?: string;
-  error?: string;
+  error?: "ALREADY_MEMBER" | string;
   user?: {
     id: string;
     name: string | null;

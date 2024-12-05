@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { searchUsers, SearchedUser } from "@/actions/search-users";
 import { addUserToTrip } from "@/actions/add-user-to-trip";
 import { deleteUserFromTrip } from "@/actions/del-user-from-trip";
+import { useSession } from "next-auth/react";
 
 interface TripboxProps {
   id: string;
@@ -49,6 +50,11 @@ interface UserImage {
   name: string | null;
 }
 
+interface InviteError {
+  userId: string;
+  message: string;
+}
+
 export default function Tripbox({
   id,
   name,
@@ -58,6 +64,7 @@ export default function Tripbox({
   onUpdate,
   onDelete,
 }: TripboxProps) {
+  const { data: session } = useSession();
   const [isDeleting, setIsDeleting] = useState(false);
   const [userImages, setUserImages] = useState<UserImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -71,6 +78,7 @@ export default function Tripbox({
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchedUser[]>([]);
   const [isNotFoundDialogOpen, setIsNotFoundDialogOpen] = useState(false);
+  const [inviteErrors, setInviteErrors] = useState<InviteError[]>([]);
 
   useEffect(() => {
     const loadUserImages = async () => {
@@ -149,63 +157,59 @@ export default function Tripbox({
     try {
       const result = await addUserToTrip(user.id, id);
 
-      if (result.error) {
-        setIsSearchDialogOpen(false);
-        setSearchEmail("");
-        setSearchResults([]);
+      if (result.error === "ALREADY_MEMBER") {
+        const memberUser = result.user!;
+        setInviteErrors((current) => [
+          ...current,
+          {
+            userId: user.id,
+            message: `${
+              memberUser.name || "This user"
+            } is already a member of this trip`,
+          },
+        ]);
 
         setTimeout(() => {
-          if (result.error === "ALREADY_MEMBER" && result.user) {
-            toast.error(
-              <div className="flex flex-col gap-1">
-                <p className="font-medium">Already a Member</p>
-                <p className="text-sm">
-                  {result.user.name || "This user"} is already part of this trip
-                </p>
-              </div>,
-              {
-                style: {
-                  background: "#FEF3C7",
-                  border: "1px solid #F59E0B",
-                  color: "#92400E",
-                },
-                duration: 4000,
-              }
-            );
-          } else {
-            toast.error(result.error);
-          }
-        }, 100);
+          setInviteErrors((current) =>
+            current.filter((error) => error.userId !== user.id)
+          );
+        }, 3000);
+        return;
+      }
+
+      if (result.error) {
+        toast.error(result.error);
+        setIsSearchDialogOpen(false);
         return;
       }
 
       if (result.success && result.user) {
+        const newUser = result.user;
+
         setIsSearchDialogOpen(false);
         setSearchEmail("");
         setSearchResults([]);
-
-        setTimeout(() => {
-          toast.success(result.success);
-        }, 100);
+        setInviteErrors([]);
 
         setTripUsers((current) => {
-          if (result.user) {
-            return [
-              ...current,
-              {
-                id: result.user.id,
-                name: result.user.name,
-                email: result.user.email,
-                image: result.user.image,
-                role: result.user.role,
-              },
-            ];
-          }
-          return current;
+          return [
+            ...current,
+            {
+              id: newUser.id,
+              name: newUser.name,
+              email: newUser.email,
+              image: newUser.image,
+              role: newUser.role,
+            },
+          ];
         });
 
         const images = await getTripUsersImages(id);
         setUserImages(images);
+
+        setTimeout(() => {
+          toast.success(result.success);
+        }, 100);
       }
     } catch (error) {
       toast.error("Failed to add user to trip");
@@ -379,7 +383,7 @@ export default function Tripbox({
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={user.image || ""} />
                         <AvatarFallback className="bg-gray-400 text-white">
-                          <FaUser className="w-6 h-6 mt-2" />
+                          <FaUser className="w-8 h-8 mt-2" />
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
@@ -388,30 +392,32 @@ export default function Tripbox({
                         </p>
                         <p className="text-sm text-gray-500">{user.email}</p>
                       </div>
-                      <AlertDialog>
-                        <AlertDialogTrigger>
-                          <FaTrashCan className="text-black cursor-pointer hover:text-red-600 duration-300" />
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="w-[90%] sm:w-full rounded-xl">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Remove Member</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to remove{" "}
-                              {user.name || "this user"} from the trip? This
-                              action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteUser(user.id)}
-                              className="bg-red-500 hover:bg-red-600"
-                            >
-                              Remove
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      {session?.user?.id !== user.id && (
+                        <AlertDialog>
+                          <AlertDialogTrigger>
+                            <FaTrashCan className="text-black cursor-pointer hover:text-red-600 duration-300" />
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="w-[90%] sm:w-full rounded-xl">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Remove Member</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to remove{" "}
+                                {user.name || "this user"} from the trip? This
+                                action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="bg-red-500 hover:bg-red-600"
+                              >
+                                Remove
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </div>
                   ))
                 ) : (
@@ -440,7 +446,7 @@ export default function Tripbox({
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={user.image || ""} />
                       <AvatarFallback className="bg-gray-400 text-white">
-                        <FaUser className="w-6 h-6 mt-2" />
+                        <FaUser className="w-8 h-8 mt-2" />
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
@@ -457,7 +463,14 @@ export default function Tripbox({
                       Invite
                     </Button>
                   </div>
-                  <p className="text-center mt-2 text-red-500 text-sm">{}</p>
+                  {inviteErrors.find((error) => error.userId === user.id) && (
+                    <div className="text-center mt-2 text-amber-600 text-sm bg-amber-50 p-2 rounded-md border border-amber-200">
+                      {
+                        inviteErrors.find((error) => error.userId === user.id)
+                          ?.message
+                      }
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
