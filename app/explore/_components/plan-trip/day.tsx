@@ -118,7 +118,14 @@ function CommuteTime({
   }, [googleMapsLoaded, origin, destination, travelMode]);
 
   if (!googleMapsLoaded) return <div>Loading Maps...</div>;
-  if (error) return <div className="text-black text-xs">{error}</div>;
+  if (error)
+    return (
+      <div className="flex-col items-center flex">
+        <div className="p-0.5 bg-blue-200 rounded-full "></div>
+        <div className="text-black text-xs">{error}</div>
+        <div className="p-0.5 bg-blue-200 rounded-full "></div>
+      </div>
+    );
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -173,7 +180,7 @@ function CommuteTime({
           </SelectItem>
         </SelectContent>
       </Select>
-      <div className="p-0.5 bg-blue-200 rounded-full mt-1"></div>
+      <div className="p-0.5 bg-blue-200 rounded-full mt-0.5 -mb-0.5"></div>
       <div className="flex items-center gap-1 text-sm">
         {commuteTime || "Calculating..."}
       </div>
