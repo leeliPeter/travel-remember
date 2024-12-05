@@ -3,6 +3,7 @@ import ReadOnlyDay from "./readonly-day";
 import { getScheduleByTripId } from "@/data/get-scheduleby-tripId";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import InvalidSchedule from "../plan-trip/invalid-schedule";
 
 interface ReadOnlyScheduleProps {
   trip: Trip;
@@ -10,12 +11,14 @@ interface ReadOnlyScheduleProps {
 
 export default function ReadOnlySchedule({ trip }: ReadOnlyScheduleProps) {
   const [daySchedules, setDaySchedules] = useState<any[]>([]);
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSchedule = async () => {
       const result = await getScheduleByTripId(trip.id);
 
       if (result.error) {
+        setScheduleError(result.error);
         toast.error(result.error);
         return;
       }
@@ -34,6 +37,10 @@ export default function ReadOnlySchedule({ trip }: ReadOnlyScheduleProps) {
 
     fetchSchedule();
   }, [trip.id]);
+
+  if (scheduleError) {
+    return <InvalidSchedule />;
+  }
 
   const getDatesInRange = (startDate: Date, endDate: Date) => {
     const dates = [];

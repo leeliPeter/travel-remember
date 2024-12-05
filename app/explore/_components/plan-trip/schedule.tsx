@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RiSave3Line } from "react-icons/ri";
 import { getScheduleByTripId } from "@/data/get-scheduleby-tripId";
+import InvalidSchedule from "./invalid-schedule";
 
 interface DaySchedule {
   dayId: string;
@@ -51,6 +52,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const pendingChangesRef = useRef(false);
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
 
   // Add this function to generate a unique ID
   const generateUniqueId = () => {
@@ -65,6 +67,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
       const result = await getScheduleByTripId(trip.id);
 
       if (result.error) {
+        setScheduleError(result.error);
         toast.error(result.error);
         return;
       }
@@ -454,6 +457,10 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
       }
     },
   }));
+
+  if (scheduleError) {
+    return <InvalidSchedule />;
+  }
 
   if (!trip || !trip.startDate || !trip.endDate) {
     return (

@@ -15,6 +15,7 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 import { DraggingPreview } from "./plan-trip/location-box";
+import InvalidSchedule from "./plan-trip/invalid-schedule";
 
 // Add interface for extended Location type
 interface ExtendedLocation extends Location {
@@ -37,6 +38,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
   const [activeLocation, setActiveLocation] = useState<ExtendedLocation | null>(
     null
   );
+  const [isInvalidTrip, setIsInvalidTrip] = useState(false);
 
   const handleListClick = (list: ListWithLocations) => {
     setSelectedList(selectedList?.id === list.id ? null : list);
@@ -96,6 +98,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
         const result = await getTrip(tripId);
 
         if (result.error) {
+          setIsInvalidTrip(true);
           toast.error(result.error);
           return;
         }
@@ -109,6 +112,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
         }
       } catch (error) {
         console.error("Error fetching trip info:", error);
+        setIsInvalidTrip(true);
         toast.error("Failed to load trip information");
       } finally {
         setIsLoading(false);
@@ -122,6 +126,14 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
     return (
       <div className="h-[90vh] flex items-center justify-center">
         <Loading size="large" text="Loading trip information..." />
+      </div>
+    );
+  }
+
+  if (isInvalidTrip) {
+    return (
+      <div className="h-[90vh]">
+        <InvalidSchedule />
       </div>
     );
   }
