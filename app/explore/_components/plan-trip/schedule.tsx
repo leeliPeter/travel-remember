@@ -513,6 +513,27 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
     }
   };
 
+  // Update handleLocationDeleted function
+  const handleLocationDeleted = (dayId: string, locationId: string) => {
+    // Update daySchedules state immediately
+    setDaySchedules((prevSchedules) =>
+      prevSchedules.map((schedule) => {
+        if (schedule.dayId === dayId) {
+          return {
+            ...schedule,
+            locations: schedule.locations.filter(
+              (loc) => loc.id !== locationId
+            ),
+          };
+        }
+        return schedule;
+      })
+    );
+
+    // Set edited flag to true to show save button pulse
+    setIsEdited(true);
+  };
+
   return (
     <div className="relative w-full h-full">
       <style jsx>{pulseAnimation}</style>
@@ -554,6 +575,10 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
                 locations={daySchedule?.locations || []}
                 onTimeChange={handleTimeUpdate}
                 onWayToCommuteChange={handleWayToCommuteChange}
+                tripId={trip.id}
+                onLocationDeleted={(locationId) =>
+                  handleLocationDeleted(dayId, locationId)
+                }
               />
             );
           })}

@@ -41,6 +41,8 @@ interface DayProps {
     locationId: string,
     wayToCommute: "DRIVING" | "WALKING" | "TRANSIT"
   ) => void;
+  tripId: string;
+  onLocationDeleted?: (locationId: string) => void;
 }
 
 // Move CommuteTime to a separate component to avoid re-renders
@@ -171,7 +173,7 @@ function CommuteTime({
           </SelectItem>
         </SelectContent>
       </Select>
-
+      <div className="p-0.5 bg-blue-200 rounded-full mt-1"></div>
       <div className="flex items-center gap-1 text-sm">
         {commuteTime || "Calculating..."}
       </div>
@@ -185,6 +187,8 @@ export default function Day({
   locations,
   onTimeChange,
   onWayToCommuteChange,
+  tripId,
+  onLocationDeleted,
 }: DayProps) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
@@ -220,7 +224,7 @@ export default function Day({
   return (
     <div
       ref={setNodeRef}
-      className={`h-full w-[300px] border-2 overflow-y-auto ${
+      className={`h-full w-[280px]  border-2 overflow-y-auto ${
         isOver ? "border-blue-400 bg-blue-50" : "border-gray-200 bg-white"
       } flex flex-col items-center p-2 rounded-lg transition-colors`}
     >
@@ -230,7 +234,7 @@ export default function Day({
           items={locations.map((loc) => loc.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="space-y-2 transition-all pb-24 duration-300 ease-in-out">
+          <div className="space-y-2 transition-all   pb-24 duration-300 ease-in-out">
             {locations.map((location, index) => {
               const locationBoxId = locationIdMap[location.id];
 
@@ -238,7 +242,6 @@ export default function Day({
                 <div key={locationBoxId}>
                   {index !== 0 && (
                     <div className="w-full space-y-1 flex pb-1 flex-col items-center">
-                      <div className="p-0.5 bg-blue-200 rounded-full"></div>
                       <div className="flex flex-col items-center ">
                         <div className="commute-time">
                           {locations[index - 1] && (
@@ -257,7 +260,6 @@ export default function Day({
                           )}
                         </div>
                       </div>
-                      <div className="p-0.5 bg-blue-200 rounded-full"></div>
                     </div>
                   )}
                   <div className="transition-all duration-300 ease-in-out">
@@ -273,6 +275,8 @@ export default function Day({
                       onTimeChange={(type, time) =>
                         handleTimeChange(location.id, type, time)
                       }
+                      tripId={tripId}
+                      onLocationDeleted={() => onLocationDeleted?.(location.id)}
                     />
                   </div>
                 </div>

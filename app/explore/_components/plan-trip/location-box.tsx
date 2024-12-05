@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { IoMdClose } from "react-icons/io";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { deleteLocationFromDay } from "@/actions/del-location-from-day";
+import { toast } from "sonner";
 
 interface LocationBoxProps {
   id: string;
@@ -21,6 +24,8 @@ interface LocationBoxProps {
   arrivalTime?: string;
   departureTime?: string;
   onTimeChange?: (type: "arrival" | "departure", time: string) => void;
+  tripId: string;
+  onLocationDeleted?: () => void;
 }
 
 function TimePickerDialog({
@@ -117,31 +122,13 @@ export default function LocationBox({
   arrivalTime: initialArrivalTime = "--:--",
   departureTime: initialDepartureTime = "--:--",
   onTimeChange,
+  tripId,
+  onLocationDeleted,
 }: LocationBoxProps) {
   const [arrivalTime, setArrivalTime] = useState(initialArrivalTime);
   const [departureTime, setDepartureTime] = useState(initialDepartureTime);
   const [isArrivalDialogOpen, setIsArrivalDialogOpen] = useState(false);
   const [isDepartureDialogOpen, setIsDepartureDialogOpen] = useState(false);
-
-  const handleArrivalTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = e.target.value;
-    setArrivalTime(newTime);
-    onTimeChange?.("arrival", newTime);
-  };
-
-  const handleDepartureTimeChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const newTime = e.target.value;
-    setDepartureTime(newTime);
-    onTimeChange?.("departure", newTime);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-    }
-  };
 
   const {
     attributes,
@@ -173,7 +160,8 @@ export default function LocationBox({
       if (
         e.target instanceof HTMLButtonElement ||
         e.target instanceof HTMLInputElement ||
-        (e.target as HTMLElement).closest('[role="dialog"]')
+        (e.target as HTMLElement).closest('[role="dialog"]') ||
+        (e.target as HTMLElement).closest(".delete-button")
       ) {
         return;
       }
@@ -196,6 +184,30 @@ export default function LocationBox({
     boxShadow: isOver ? "0 4px 6px -1px rgba(0, 0, 0, 0.1)" : "none",
   };
 
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    try {
+      const result = await deleteLocationFromDay(tripId, dayId, id);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      if (result.success) {
+        onLocationDeleted?.();
+
+        toast.success(result.success, {
+          position: "bottom-right",
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to delete location");
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -203,7 +215,7 @@ export default function LocationBox({
       {...attributes}
       {...modifiedListeners}
       className={`
-        location-box w-full bg-gray-200 rounded-lg 
+        location-box mx-auto w-full max-w-[260px] bg-gray-200 rounded-lg 
         transition-all duration-300 ease-in-out cursor-move
         ${
           isDragging
@@ -213,7 +225,13 @@ export default function LocationBox({
         ${isOver ? "ring-2 ring-blue-400 scale-[1.02]" : ""}
       `}
     >
-      <div className="flex items-center h-24 flex-row p-2">
+      <div className="flex items-center relative h-24 flex-row p-2">
+        <div className="absolute top-2 text-gray-500 right-2 delete-button">
+          <IoMdClose
+            className="cursor-pointer hover:text-red-500 transition-colors"
+            onClick={handleDelete}
+          />
+        </div>
         <div className="place-img w-1/3 h-full">
           {img && (
             <Image
@@ -227,7 +245,7 @@ export default function LocationBox({
           )}
         </div>
         <div className="place-info text-xs flex flex-col justify-between pl-1 space-y-1 w-2/3">
-          <div className="arrive-time flex items-center justify-between text-gray-500">
+          <div className="arrive-time flex items-center pl-2   justify-start space-x-4 text-gray-500">
             <div className="text-xs">Arrive:</div>
             <Button
               variant="outline"
@@ -242,7 +260,7 @@ export default function LocationBox({
             </Button>
           </div>
           <div className="place-name text-sm font-medium truncate">{name}</div>
-          <div className="departure-time flex items-center justify-between text-gray-500">
+          <div className="departure-time flex items-center pl-2  justify-start space-x-3 text-gray-500">
             <div className="text-xs">Depart:</div>
             <Button
               variant="outline"
@@ -310,7 +328,7 @@ export const DraggingPreview = ({
   };
 
   return (
-    <div className="w-[300px] bg-white rounded-lg shadow-xl ring-2 ring-blue-400 transform-gpu scale-105 opacity-95">
+    <div className="w-[250px] bg-white rounded-lg shadow-xl ring-2 ring-blue-400 transform-gpu scale-105 opacity-95">
       <div className="flex items-center h-24 flex-row p-2">
         <div className="place-img w-1/3 h-full">
           {img && (
