@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { addLocation } from "@/actions/add-location";
 import { toast } from "sonner";
 import { List, Location } from "@prisma/client";
+import Image from "next/image";
 
 const containerStyle = {
   width: "100%",
@@ -17,13 +18,6 @@ const defaultCenter = {
 };
 
 const libraries: "places"[] = ["places"];
-
-interface PlaceInfo {
-  name: string;
-  address: string;
-  position: google.maps.LatLngLiteral;
-  placeId?: string;
-}
 
 interface MapClickEvent extends google.maps.MapMouseEvent {
   placeId?: string;
@@ -42,7 +36,6 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
   console.log("Lists received in Map:", lists);
 
   const [isBrowser, setIsBrowser] = useState(false);
-  const [selectedPlace, setSelectedPlace] = useState<PlaceInfo | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -105,8 +98,10 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
               {photoUrl && (
-                <img
+                <Image
                   src={photoUrl}
+                  width={40}
+                  height={40}
                   alt={place.name || ""}
                   className="w-10 h-10 rounded-md object-cover"
                   onError={(e) => {
@@ -138,6 +133,7 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
         currentPlaceRef.current = null;
       }
     } catch (error) {
+      console.error("Error adding location:", error);
       toast.error("Failed to add location", {
         position: "bottom-right",
         className: "bg-white",
@@ -355,7 +351,6 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
           if (infoWindowRef.current) {
             infoWindowRef.current.close();
           }
-          setSelectedPlace(null);
           return;
         }
 

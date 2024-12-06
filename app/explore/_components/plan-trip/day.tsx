@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import LocationBox from "./location-box";
 import { useDroppable } from "@dnd-kit/core";
 import { Location } from "@prisma/client";

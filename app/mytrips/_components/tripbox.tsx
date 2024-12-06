@@ -73,7 +73,6 @@ export default function Tripbox({
   const [tripUsers, setTripUsers] = useState<TripUser[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [searchEmail, setSearchEmail] = useState("");
-  const [searchedUser, setSearchedUser] = useState<SearchedUser | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchedUser[]>([]);
@@ -127,6 +126,7 @@ export default function Tripbox({
         setIsUsersDialogOpen(true);
       }
     } catch (error) {
+      console.error("Error loading trip members:", error);
       toast.error("Failed to load trip members");
     } finally {
       setIsLoadingUsers(false);
@@ -147,6 +147,7 @@ export default function Tripbox({
         setIsSearchDialogOpen(true);
       }
     } catch (error) {
+      console.error("Error searching users:", error);
       toast.error("Failed to search user");
     } finally {
       setIsSearching(false);
@@ -212,6 +213,7 @@ export default function Tripbox({
         }, 100);
       }
     } catch (error) {
+      console.error("Error inviting user to trip:", error);
       toast.error("Failed to add user to trip");
     }
   };
@@ -234,6 +236,7 @@ export default function Tripbox({
         setUserImages(images);
       }
     } catch (error) {
+      console.error("Error removing user from trip:", error);
       toast.error("Failed to remove user from trip");
     }
   };

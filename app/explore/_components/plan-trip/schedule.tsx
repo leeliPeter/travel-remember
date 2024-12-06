@@ -509,6 +509,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
         },
       });
     } catch (error) {
+      console.error("Error saving schedule:", error);
       toast.error("Failed to save schedule", {
         position: "bottom-right",
         duration: 3000,

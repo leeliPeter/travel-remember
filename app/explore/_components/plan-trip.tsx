@@ -6,6 +6,7 @@ import { getTrip } from "@/actions/get-trip";
 import { getListsByTripId } from "@/data/get-lists-by-tripId";
 import Loading from "@/components/loading";
 import { List, Location } from "@prisma/client";
+import Image from "next/image";
 import SchedulePage from "./plan-trip/schedule";
 import {
   DndContext,
@@ -271,7 +272,9 @@ function DraggableLocation({ location }: { location: Location }) {
         {location.name}
       </div>
       {location.photoUrl && (
-        <img
+        <Image
+          width={100}
+          height={100}
           src={location.photoUrl}
           alt={location.name}
           className="w-full h-24 object-cover hidden xl:block rounded-md mt-2"

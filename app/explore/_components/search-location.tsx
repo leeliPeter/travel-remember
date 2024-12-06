@@ -10,6 +10,7 @@ import { getListsByTripId } from "@/data/get-lists-by-tripId";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { deleteList } from "@/actions/delete-list";
+import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import {
   AlertDialog,
@@ -151,6 +152,7 @@ export default function SearchLocation() {
         fetchLists(); // Refresh lists after creating a new one
       }
     } catch (error) {
+      console.error("Error creating list:", error);
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
@@ -180,6 +182,7 @@ export default function SearchLocation() {
         }
       }
     } catch (error) {
+      console.error("Error deleting list:", error);
       toast.error("Failed to delete list");
     }
   };
@@ -222,6 +225,7 @@ export default function SearchLocation() {
         );
       }
     } catch (error) {
+      console.error("Error deleting location:", error);
       toast.error("Failed to delete location");
     }
   };
@@ -346,8 +350,10 @@ export default function SearchLocation() {
                                 {location.name}
                               </div>
                               {location.photoUrl && (
-                                <img
+                                <Image
                                   src={location.photoUrl}
+                                  width={100}
+                                  height={100}
                                   alt={location.name}
                                   className="w-full hidden xl:block h-16 sm:h-24 object-cover rounded-md mt-2"
                                   onError={(e) => {

@@ -114,7 +114,6 @@ function TimePickerDialog({
 
 export default function LocationBox({
   id,
-  boxId,
   name,
   img,
   address,
@@ -135,7 +134,6 @@ export default function LocationBox({
     listeners,
     setNodeRef,
     transform,
-    transition,
     isDragging,
     isOver,
     active,
@@ -204,6 +202,7 @@ export default function LocationBox({
         });
       }
     } catch (error) {
+      console.error("Error deleting location:", error);
       toast.error("Failed to delete location");
     }
   };

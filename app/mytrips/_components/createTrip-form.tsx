@@ -26,7 +26,7 @@ interface CreateTripFormProps {
 }
 
 export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
