@@ -75,7 +75,7 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
   };
 
   return (
-    <div className="p-2 sm:p-4 max-h-[90vh] overflow-y-auto">
+    <div className="p-0 px-1 sm:p-4 max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle className="text-xl sm:text-2xl font-bold text-center">
           Create New Trip
@@ -84,7 +84,7 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-4 mt-4"
+          className="space-y-1 md:space-y-2 lg:space-y-4 mt-4"
         >
           <FormField
             control={form.control}

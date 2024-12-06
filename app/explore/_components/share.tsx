@@ -50,9 +50,17 @@ export default function Share({ tripId }: ShareProps) {
     fetchTripInfo();
   }, [tripId]);
 
+  // const handleShare = () => {
+  //   if (tripId) {
+  //     router.push(`/public-share?tripId=${tripId}`);
+  //   } else {
+  //     toast.error("No trip selected to share");
+  //   }
+  // };
   const handleShare = () => {
     if (tripId) {
-      router.push(`/public-share?tripId=${tripId}`);
+      // Open in new window/tab
+      window.open(`/public-share?tripId=${tripId}`, "_blank");
     } else {
       toast.error("No trip selected to share");
     }

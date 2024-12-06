@@ -162,7 +162,7 @@ export default function Nav({ user }: NavProps) {
           isMenuOpen ? "h-[430px]" : "h-0"
         }`}
       >
-        <ul className="flex flex-col items-center mt-14 space-y-6 w-full">
+        <ul className="flex flex-col items-around mt-20 space-y-6 w-full">
           {user && (
             <div className="flex flex-col items-center gap-y-6">
               <Avatar className="">
@@ -185,16 +185,7 @@ export default function Nav({ user }: NavProps) {
               </Button>
             </div>
           )}
-          <li className="group flex flex-col items-center gap-2">
-            <Link
-              className="text-white text-lg font-bold"
-              href="/explore"
-              onClick={closeMenu}
-            >
-              Explore
-            </Link>
-            <div className="group-hover:w-[80%] w-0 text-center duration-500 border-b-2 border-white mx-2"></div>
-          </li>
+
           <li className="group flex flex-col items-center gap-2">
             <Link
               className="text-white text-lg font-bold"

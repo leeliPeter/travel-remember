@@ -24,7 +24,7 @@ export default function ExploreLayout({ children }: ExploreLayoutProps) {
               className={`explore-nav cursor-pointer hover:text-primary transition-colors
                 ${currentView === "search" ? "active" : ""}`}
             >
-              Search Location
+              Search
             </Link>
             <Link
               href={`/explore?view=plan${tripId ? `&tripId=${tripId}` : ""}`}

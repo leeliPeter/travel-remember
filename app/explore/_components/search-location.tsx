@@ -239,7 +239,7 @@ export default function SearchLocation() {
   }
 
   return (
-    <div className="flex space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-col md:flex-row h-[90vh]">
+    <div className="flex  space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-row h-[90vh]">
       <div className="box1 w-full md:w-1/5 h-full  flex-col flex  ">
         {tripInfo ? (
           <div className="w-full bg-white  h-[15%] overflow-y-auto flex  flex-col justify-around items-center">

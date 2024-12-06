@@ -547,9 +547,9 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
           fullscreenControl: false,
           clickableIcons: true,
           disableDefaultUI: false,
+          gestureHandling: "greedy",
         }}
         onClick={(e: google.maps.MapMouseEvent) => {
-          // Prevent default InfoWindow
           e.stop?.();
         }}
       />
