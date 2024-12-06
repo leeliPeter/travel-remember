@@ -1,25 +1,30 @@
 import { Trip } from "@prisma/client";
 import ReadOnlyDay from "./readonly-day";
 import { getScheduleByTripId } from "@/data/get-scheduleby-tripId";
+import { getPublicSchedule } from "@/actions/get-schedule-no-login";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import InvalidSchedule from "../plan-trip/invalid-schedule";
 
 interface ReadOnlyScheduleProps {
   trip: Trip;
+  isPublic?: boolean;
 }
 
-export default function ReadOnlySchedule({ trip }: ReadOnlyScheduleProps) {
+export default function ReadOnlySchedule({
+  trip,
+  isPublic = false,
+}: ReadOnlyScheduleProps) {
   const [daySchedules, setDaySchedules] = useState<any[]>([]);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSchedule = async () => {
-      const result = await getScheduleByTripId(trip.id);
+      const result = isPublic
+        ? await getPublicSchedule(trip.id)
+        : await getScheduleByTripId(trip.id);
 
-      if (result.error) {
-        setScheduleError(result.error);
-        toast.error(result.error);
+      if (!result.success) {
+        setScheduleError("Schedule not found");
         return;
       }
 
@@ -36,7 +41,7 @@ export default function ReadOnlySchedule({ trip }: ReadOnlyScheduleProps) {
     };
 
     fetchSchedule();
-  }, [trip.id]);
+  }, [trip.id, isPublic]);
 
   if (scheduleError) {
     return <InvalidSchedule />;
@@ -66,7 +71,7 @@ export default function ReadOnlySchedule({ trip }: ReadOnlyScheduleProps) {
   );
 
   return (
-    <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-3">
+    <div className="w-full relative h-full overflow-x-auto  p-3">
       <div className="flex h-full space-x-4 min-w-fit">
         {tripDates.map((date, index) => {
           const dayId = `day-${index}`;
