@@ -16,9 +16,9 @@ export default function ExploreLayout({ children }: ExploreLayoutProps) {
 
   return (
     <>
-      <div className="trip-page pb-6 h-full min-h-screen pt-20 ">
+      <div className="trip-page pb-6 h-full min-h-screen pt-[68px] md:pt-20 ">
         <div className=" mx-auto px-4">
-          <div className="nav w-full container mx-auto h-12 bg-white/20 backdrop-blur-sm space-x-2 rounded-lg mb-6 flex justify-between items-center px-2">
+          <div className="nav w-full container mx-auto h-12 bg-white/20 backdrop-blur-sm space-x-2 rounded-lg mb-2 md:mb-6 flex justify-between items-center px-2">
             <Link
               href={`/explore?view=search${tripId ? `&tripId=${tripId}` : ""}`}
               className={`explore-nav cursor-pointer hover:text-primary transition-colors

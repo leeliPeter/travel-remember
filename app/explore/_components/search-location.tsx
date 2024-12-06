@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { deleteList } from "@/actions/delete-list";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
+import { FaAnglesRight } from "react-icons/fa6";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,6 +70,8 @@ export default function SearchLocation() {
   const searchParams = useSearchParams();
   const tripId = searchParams.get("tripId");
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [box1Width, setBox1Width] = useState("270px");
 
   if (!tripId) {
     return <InvalidTrip />;
@@ -230,6 +233,52 @@ export default function SearchLocation() {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const box1 = document.querySelector(".box1");
+      const menuButton = document.querySelector(".menu-button");
+
+      if (
+        isMenuOpen &&
+        box1 &&
+        !box1.contains(event.target as Node) &&
+        menuButton &&
+        !menuButton.contains(event.target as Node)
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) {
+        // xl
+        setBox1Width("360px");
+      } else if (window.innerWidth >= 1024) {
+        // lg
+        setBox1Width("330px");
+      } else if (window.innerWidth >= 768) {
+        // md
+        setBox1Width("300px");
+      } else {
+        setBox1Width("270px");
+      }
+    };
+
+    // Initial call
+    handleResize();
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (isInitialLoading) {
     return (
       <div className="h-[90vh] flex items-center justify-center">
@@ -239,8 +288,33 @@ export default function SearchLocation() {
   }
 
   return (
-    <div className="flex  space-y-4 md:space-y-0 rounded-lg overflow-hidden flex-row h-[90vh]">
-      <div className="box1 w-full md:w-1/5 h-full  flex-col flex  ">
+    <div className="flex relative rounded-lg w-full mx-auto overflow-hidden flex-row h-[90vh]">
+      <div
+        className="absolute md:hidden z-30 top-[35%] left-[0px] transition-all duration-500"
+        style={{ left: isMenuOpen ? box1Width : "0px" }}
+      >
+        <div
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="menu-button bg-gray-100 cursor-pointer text-black flex flex-col lowercase items-center rounded-r-lg p-2 text-sm"
+        >
+          <FaAnglesRight
+            className={`h-4 w-4 mb-1 transition-transform duration-500 ${
+              isMenuOpen ? "rotate-180" : ""
+            }`}
+          />
+          <p>m</p>
+          <p>e</p>
+          <p>n</p>
+          <p>u</p>
+        </div>
+      </div>
+      <div
+        className={`box1 overflow-hidden transition-all duration-500 z-20 h-full absolute md:relative flex-col flex`}
+        style={{
+          width: window?.innerWidth >= 768 || isMenuOpen ? box1Width : "0px",
+          display: "flex",
+        }}
+      >
         {tripInfo ? (
           <div className="w-full bg-white  h-[15%] overflow-y-auto flex  flex-col justify-around items-center">
             <p className="text-xl font-bold w-[80%] mt-1  text-center truncate capitalize">
@@ -271,7 +345,7 @@ export default function SearchLocation() {
               Lists
             </div>
             {lists.length > 0 ? (
-              <div className="space-y-2 max-h-[90%]  overflow-y-auto">
+              <div className="space-y-2 max-h-[90%] lg:max-h-[95%] xl:max-h-[100%]   overflow-y-auto">
                 {lists.map((list) => (
                   <div key={list.id} className="flex flex-col">
                     <div
@@ -352,8 +426,8 @@ export default function SearchLocation() {
                               {location.photoUrl && (
                                 <Image
                                   src={location.photoUrl}
-                                  width={100}
-                                  height={100}
+                                  width={200}
+                                  height={200}
                                   alt={location.name}
                                   className="w-full hidden xl:block h-16 sm:h-24 object-cover rounded-md mt-2"
                                   onError={(e) => {
@@ -407,7 +481,7 @@ export default function SearchLocation() {
           </div>
         </div>
       </div>
-      <div className="box2 w-full h-full md:w-4/5 bg-white rounded-lg">
+      <div className="box2 w-full h-full bg-white">
         <Map
           lists={lists}
           onLocationAdded={handleLocationAdded}
