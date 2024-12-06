@@ -7,14 +7,12 @@ import Loading from "@/components/loading";
 import ReadOnlySchedule from "./share/readonly-schedule";
 import InvalidSchedule from "./plan-trip/invalid-schedule";
 import { FaShareSquare } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 
 interface ShareProps {
   tripId: string | null;
 }
 
 export default function Share({ tripId }: ShareProps) {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [tripInfo, setTripInfo] = useState<any>(null);
   const [isInvalidTrip, setIsInvalidTrip] = useState(false);
@@ -50,13 +48,6 @@ export default function Share({ tripId }: ShareProps) {
     fetchTripInfo();
   }, [tripId]);
 
-  // const handleShare = () => {
-  //   if (tripId) {
-  //     router.push(`/public-share?tripId=${tripId}`);
-  //   } else {
-  //     toast.error("No trip selected to share");
-  //   }
-  // };
   const handleShare = () => {
     if (tripId) {
       // Open in new window/tab
