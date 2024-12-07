@@ -4,7 +4,7 @@ import { ImFacebook2 } from "react-icons/im";
 import { GrInstagram, GrLinkedin } from "react-icons/gr";
 
 export default function footer() {
-  const links = [{ href: "/", label: "My Trips" }];
+  const links = [{ href: "/mytrips", label: "My Trips" }];
   return (
     <footer className=" bg-black px-6 py-12">
       <div className="max-w-6xl container mx-auto space-y-10 md:space-y-0 flex flex-col md:flex-row items-center md:justify-between">

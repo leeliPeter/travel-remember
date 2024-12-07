@@ -61,7 +61,7 @@ export default function PublicShare() {
               <h2 className=" text-sm md:text-2xl font-bold truncate">
                 {tripInfo.name}
               </h2>
-              <div className="flex text-xs md:text-base space-x-1 md:space-x-2 items-center text-gray-600">
+              <div className="flex text-xs md:text-base min-w-fit space-x-1 md:space-x-2 items-center text-gray-600">
                 <p>{new Date(tripInfo.startDate).toLocaleDateString()}</p>
                 <p className="mx-2">-</p>
                 <p>{new Date(tripInfo.endDate).toLocaleDateString()}</p>

@@ -320,7 +320,7 @@ export default function SearchLocation() {
             <p className="text-xl font-bold w-[80%] mt-1  text-center truncate capitalize">
               {tripInfo.name}
             </p>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center truncate justify-center">
               <p className="text-sm">
                 {new Date(tripInfo.startDate).toLocaleDateString()}
               </p>
