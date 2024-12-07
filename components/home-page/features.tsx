@@ -10,7 +10,7 @@ export default function Features() {
       <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 space-x-4">
         <div className=" md:w-1/2">
           <Image
-            src="/images/map-2.jpg"
+            src="/images/step1.png"
             alt="feature1"
             width={1000}
             height={1000}
@@ -18,11 +18,11 @@ export default function Features() {
         </div>
         <div className="flex flex-col md:w-1/2 space-y-8 md:p-4 lg:p-16 text-center md:text-start">
           <h2 className="text-3xl  lg:text-4xl font-bold">
-            STEP 1 - Create a trip
+            STEP 1 - Add location
           </h2>
           <p className="text-base max-w-sm  mx-auto md:text-lg mt-4">
-            Plan your perfect trip by creating an itinerary that includes a
-            captivating title, a detailed description of your journey.
+            Add locations to your list by searching for a place and selecting it
+            from the search results.
           </p>
         </div>
       </div>
@@ -30,7 +30,7 @@ export default function Features() {
       <div className="flex flex-col md:flex-row-reverse  space-y-8 md:space-y-0 space-x-4">
         <div className=" md:w-1/2">
           <Image
-            src="/images/map-3.jpg"
+            src="/images/step2.png"
             alt="feature2"
             width={1000}
             height={1000}
@@ -38,11 +38,11 @@ export default function Features() {
         </div>
         <div className="flex flex-col md:w-1/2 space-y-8 md:p-4 lg:p-16 text-center md:text-start">
           <h2 className="text-3xl lg:text-4xl font-bold">
-            STEP 2 - Add locations
+            STEP 2 - Drag to plan
           </h2>
           <p className="text-base max-w-sm  mx-auto md:text-lg mt-4">
-            Add locations to your trip by searching for a place and selecting it
-            from the search results.
+            Select a location from the list and drag it into the schedule to
+            place it.
           </p>
         </div>
       </div>

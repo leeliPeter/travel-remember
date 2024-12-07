@@ -16,9 +16,9 @@ export default function Intro() {
           Planning your next adventure!
         </h2>
         <p className="max-w-md md:text-left text-center">
-          Our platform streamlines trip planning, helping you budget and build
-          itineraries effortlessly. Enjoy personalized recommendations and focus
-          on the journey ahead. Let’s create your perfect getaway!
+          Designed to make trip planning simple and hassle-free! Easily search
+          for locations, add your favorites to a personalized list, and
+          seamlessly drag and drop them into your schedule.
         </p>
       </div>
     </div>
