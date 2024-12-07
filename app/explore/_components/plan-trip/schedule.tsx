@@ -556,7 +556,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
       <style jsx>{pulseAnimation}</style>
       <Button
         onClick={handleManualSave}
-        className="absolute -top-10 md:-top-14 right-12  md:right-20  z-20 bg-sky-200 rounded-full p-2 md:p-4 h-auto w-auto"
+        className="absolute -top-10 md:-top-[53px] right-[52px]  md:right-20  z-20 bg-sky-200 rounded-full p-2 md:p-4 h-auto w-auto"
       >
         <div className="reminder-container absolute top-0 right-4">
           {isEdited && (
@@ -574,7 +574,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           style={{ transform: "scale(1.9)" }}
         />
       </Button>
-      <div className="group absolute -top-10 md:-top-14  z-20 right-1">
+      <div className="group absolute -top-10 md:-top-[53px]  z-20 right-2">
         <div
           onClick={handleShare}
           className="rounded-full cursor-pointer bg-green-400 p-1 md:p-3 transition-scale duration-1000  "
@@ -586,7 +586,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           <div className="absolute right-5 -top-1 h-2 w-2 rotate-45 bg-gray-800"></div>
         </div>
       </div>
-      <div className="rounded-lg h-full overflow-hidden">
+      <div className="md:rounded-r-lg h-full overflow-hidden">
         <div className="w-full relative h-full overflow-x-auto  md:rounded-r-lg  overflow-hidden bg-gray-100/70 p-1 md:p-3">
           <div className="flex h-full space-x-1 md:space-x-4 min-w-fit">
             {tripDates.map((date, index) => {
