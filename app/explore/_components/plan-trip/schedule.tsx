@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { RiSave3Line } from "react-icons/ri";
 import { getScheduleByTripId } from "@/data/get-scheduleby-tripId";
 import InvalidSchedule from "./invalid-schedule";
+import { FaShareSquare } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 interface DaySchedule {
   dayId: string;
@@ -53,6 +55,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const pendingChangesRef = useRef(false);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Add this function to generate a unique ID
   const generateUniqueId = () => {
@@ -542,12 +545,20 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
     setIsEdited(true);
   };
 
+  const handleShare = () => {
+    if (trip.id) {
+      window.open(`/public-share?tripId=${trip.id}`, "_blank");
+    } else {
+      toast.error("No trip selected to share");
+    }
+  };
+
   return (
     <div className="relative w-[calc(100vw-150px)] md:w-full h-full">
       <style jsx>{pulseAnimation}</style>
       <Button
         onClick={handleManualSave}
-        className="absolute top-2 right-2 z-20 bg-sky-200 rounded-full p-4 h-auto w-auto"
+        className="absolute -top-10 md:top-[84px] right-12 md:right-1  z-20 bg-sky-200 rounded-full p-2 md:p-4 h-auto w-auto"
       >
         <div className="reminder-container absolute top-0 right-4">
           {isEdited && (
@@ -562,9 +573,22 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
         </div>
         <RiSave3Line
           className="h-12 w-12 text-sky-500 hover:text-sky-100"
-          style={{ transform: "scale(2.0)" }}
+          style={{ transform: "scale(1.9)" }}
         />
       </Button>
+      <div className="group absolute -top-10 md:top-2 z-20 right-1">
+        <div
+          onClick={handleShare}
+          className="rounded-full cursor-pointer bg-green-400 p-1 md:p-3 transition-scale duration-1000  "
+        >
+          <FaShareSquare className="w-6 h-6 text-white" />
+        </div>
+        <div className="absolute right-0 mt-2 w-40 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
+          Share with your friends
+          <div className="absolute right-5 -top-1 h-2 w-2 rotate-45 bg-gray-800"></div>
+        </div>
+      </div>
+
       <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-1 md:p-3">
         <div className="flex h-full space-x-1 md:space-x-4 min-w-fit">
           {tripDates.map((date, index) => {

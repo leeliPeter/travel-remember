@@ -154,7 +154,7 @@ header > * {
 }
 
 .explore-nav {
-  @apply w-1/3 cursor-pointer text-center font-bold text-white hover:bg-white/40 rounded-lg p-2;
+  @apply w-1/2 cursor-pointer text-center font-bold text-white hover:bg-white/40 rounded-lg p-2;
 }
 .explore-nav.active {
   @apply bg-gray-100/90 text-black;

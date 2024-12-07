@@ -167,7 +167,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
       onDragStart={handleDragStart}
       sensors={sensors}
     >
-      <div className="flex w-screen -ml-4 md:ml-0 md:w-full h-[90vh] rounded-none md:rounded-lg  overflow-hidden flex-row ">
+      <div className="flex w-screen -ml-4 md:ml-0 md:w-full h-[90vh] rounded-none md:rounded-lg overflow-visible  md:overflow-hidden flex-row ">
         <div className="box1  min-w-[150px] w-1/5 h-full flex-col flex">
           {tripInfo ? (
             <div className="w-full bg-white h-[7%] lg:h-[15%] overflow-y-auto flex flex-col justify-around items-center">

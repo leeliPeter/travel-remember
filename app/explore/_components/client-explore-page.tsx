@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import SearchLocation from "./search-location";
 import PlanTrip from "./plan-trip";
-import Share from "./share";
 
 export default function ClientExplorePage() {
   const searchParams = useSearchParams();
@@ -14,8 +13,6 @@ export default function ClientExplorePage() {
     switch (view) {
       case "plan":
         return <PlanTrip tripId={tripId} />;
-      case "share":
-        return <Share tripId={tripId} />;
       default:
         return <SearchLocation />;
     }
