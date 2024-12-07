@@ -214,7 +214,7 @@ export default function LocationBox({
       {...attributes}
       {...modifiedListeners}
       className={`
-        location-box mx-auto  w-[205px] md:w-[250px] bg-gray-200 rounded-lg 
+        location-box mx-auto  w-[205px] md:w-[250px] 2xl:w-[270px] bg-gray-200 rounded-lg 
         transition-all duration-300 ease-in-out cursor-move
         ${
           isDragging

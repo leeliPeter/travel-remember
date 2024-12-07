@@ -141,7 +141,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
 
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-      <div className="flex w-[100vw] top-[50px]  absolute left-0 rounded-none md:rounded-lg overflow-hidden flex-row h-[82vh]">
+      <div className="flex w-[100vw] top-[50px] h-[82vh]  absolute left-0 md:relative md:top-0 md:w-full md:h-[90vh] rounded-none md:rounded-lg overflow-hidden flex-row ">
         <div className="box1  min-w-[150px] w-1/6 h-full flex-col flex">
           {tripInfo ? (
             <div className="w-full bg-white h-[7%] md:h-[15%] overflow-y-auto flex flex-col justify-around items-center">
