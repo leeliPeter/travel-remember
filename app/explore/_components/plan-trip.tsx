@@ -14,6 +14,10 @@ import {
   DragStartEvent,
   useDraggable,
   DragOverlay,
+  TouchSensor,
+  MouseSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 import { DraggingPreview } from "./plan-trip/location-box";
 import InvalidSchedule from "./plan-trip/invalid-schedule";
@@ -40,6 +44,24 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
     null
   );
   const [isInvalidTrip, setIsInvalidTrip] = useState(false);
+
+  // Add sensors configuration
+  const mouseSensor = useSensor(MouseSensor, {
+    // Lower activation delay for mouse
+    activationConstraint: {
+      distance: 10, // 10px movement before drag starts
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    // Increase activation delay for touch
+    activationConstraint: {
+      delay: 250, // 250ms delay before drag starts
+      tolerance: 5, // 5px movement allowed during delay
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
 
   const handleListClick = (list: ListWithLocations) => {
     setSelectedList(selectedList?.id === list.id ? null : list);
@@ -140,7 +162,11 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
   }
 
   return (
-    <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+    <DndContext
+      onDragEnd={handleDragEnd}
+      onDragStart={handleDragStart}
+      sensors={sensors}
+    >
       <div className="flex w-[100vw] top-[50px] h-[82vh]  absolute left-0 md:relative md:top-0 md:w-full md:h-[90vh] rounded-none md:rounded-lg overflow-hidden flex-row ">
         <div className="box1  min-w-[150px] w-1/6 h-full flex-col flex">
           {tripInfo ? (
