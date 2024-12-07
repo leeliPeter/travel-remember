@@ -167,14 +167,14 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
       onDragStart={handleDragStart}
       sensors={sensors}
     >
-      <div className="flex w-[100vw] top-[50px] h-[82vh]  absolute left-0 md:relative md:top-0 md:w-full md:h-[90vh] rounded-none md:rounded-lg overflow-hidden flex-row ">
-        <div className="box1  min-w-[150px] w-1/6 h-full flex-col flex">
+      <div className="flex w-screen -ml-4 md:ml-0 md:w-full h-[90vh] rounded-none md:rounded-lg  overflow-hidden flex-row ">
+        <div className="box1  min-w-[150px] w-1/5 h-full flex-col flex">
           {tripInfo ? (
-            <div className="w-full bg-white h-[7%] md:h-[15%] overflow-y-auto flex flex-col justify-around items-center">
+            <div className="w-full bg-white h-[7%] lg:h-[15%] overflow-y-auto flex flex-col justify-around items-center">
               <p className=" font-bold w-[80%]  text-base md:text-xl mt-1 text-center truncate capitalize">
                 {tripInfo.name}
               </p>
-              <div className="hidden md:flex  items-center justify-center">
+              <div className="hidden lg:flex  items-center justify-center">
                 <p className="text-sm">
                   {new Date(tripInfo.startDate).toLocaleDateString()}
                 </p>
@@ -183,7 +183,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
                   {new Date(tripInfo.endDate).toLocaleDateString()}
                 </p>
               </div>
-              <p className="text-sm hidden md:block  max-w-xs px-2 line-clamp-1 lg:line-clamp-2 text-center">
+              <p className="text-sm hidden lg:block  max-w-xs px-2 line-clamp-1 lg:line-clamp-2 text-center">
                 {tripInfo.description}
               </p>
             </div>
@@ -192,7 +192,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
               Create a trip first
             </div>
           )}
-          <div className="w-full bg-gray-200 h-[93%] md:h-[85%] py-2 overflow-y-auto justify-between flex-col flex px-3 items-center">
+          <div className="w-full bg-gray-200 h-[93%] lg:h-[85%] py-2 overflow-y-auto justify-between flex-col flex px-3 items-center">
             <div className="w-full min-h-auto max-h-[90%]">
               <div className="text-base sm:text-md md:text-lg h-8 font-bold">
                 Lists
@@ -242,7 +242,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
             </div>
           </div>
         </div>
-        <div className="box2 h-full w-full md:w-5/6">
+        <div className="box2 h-full w-full md:w-4/5">
           {tripInfo && <SchedulePage ref={scheduleRef} trip={tripInfo} />}
         </div>
         <DragOverlay

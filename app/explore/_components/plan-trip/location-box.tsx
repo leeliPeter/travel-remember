@@ -244,7 +244,7 @@ export default function LocationBox({
           )}
         </div>
         <div className="place-info text-xs flex flex-col justify-between pl-1 space-y-1 w-2/3">
-          <div className="arrive-time flex items-center pl-0 md:pl-2   justify-start space-x-1 md:space-x-4 text-gray-500">
+          <div className="arrive-time flex items-center pl-1 md:pl-3   justify-start space-x-1 md:space-x-4 text-gray-500">
             <div className="text-xs">Arrive:</div>
             <Button
               variant="outline"
