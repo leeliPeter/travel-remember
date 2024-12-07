@@ -552,11 +552,49 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   };
 
   return (
-    <div className="relative w-[calc(100vw-150px)]  md:w-full h-full">
+    <div className="relative h-full">
       <style jsx>{pulseAnimation}</style>
+      <style jsx global>{`
+        @media (min-width: 768px) {
+          .scrollbar-top-wrapper {
+            transform: rotateX(180deg);
+          }
+          .scrollbar-top-content {
+            transform: rotateX(180deg);
+          }
+          .scrollbar-always-visible::-webkit-scrollbar {
+            height: 8px;
+            display: block;
+            position: sticky;
+            top: 0;
+          }
+          .scrollbar-always-visible::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+          }
+          .scrollbar-always-visible::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+          }
+          .scrollbar-always-visible::-webkit-scrollbar-thumb:hover {
+            background: #666;
+          }
+        }
+
+        /* Hide scrollbar on mobile */
+        @media (max-width: 767px) {
+          .scrollbar-always-visible::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-always-visible {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+          }
+        }
+      `}</style>
       <Button
         onClick={handleManualSave}
-        className="absolute -top-10 md:-top-[36px] right-[52px]  md:right-20  z-20 bg-sky-200 rounded-full p-2 md:p-4 h-auto w-auto"
+        className="absolute -top-10 md:-top-[50px] right-[52px] md:right-20 z-20 bg-sky-200 rounded-full p-2 md:p-4 h-auto w-auto"
       >
         <div className="reminder-container absolute top-0 right-4">
           {isEdited && (
@@ -574,7 +612,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           style={{ transform: "scale(1.9)" }}
         />
       </Button>
-      <div className="group absolute -top-10 md:-top-[36px]  z-20 right-2">
+      <div className="group absolute -top-10 md:-top-[50px] z-20 right-2">
         <div
           onClick={handleShare}
           className="rounded-full cursor-pointer bg-green-400 p-1 md:p-3 transition-scale duration-1000  "
@@ -587,8 +625,8 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
         </div>
       </div>
       <div className="md:rounded-r-lg h-full overflow-hidden">
-        <div className="w-full relative h-full overflow-x-auto  md:rounded-r-lg  overflow-hidden bg-gray-100/70 p-1 md:p-3">
-          <div className="flex h-full space-x-1 md:space-x-4 min-w-fit">
+        <div className="w-full relative h-full overflow-x-scroll scrollbar-always-visible md:rounded-r-lg bg-gray-100/70 p-1 md:p-3 scrollbar-top-wrapper">
+          <div className="flex h-full space-x-1 md:space-x-4 min-w-fit scrollbar-top-content">
             {tripDates.map((date, index) => {
               const dayId = `day-${index}`;
               const daySchedule = daySchedules.find((s) => s.dayId === dayId);

@@ -327,8 +327,8 @@ export const DraggingPreview = ({
   };
 
   return (
-    <div className="w-[250px] bg-white rounded-lg shadow-xl ring-2 ring-blue-400 transform-gpu scale-105 opacity-95">
-      <div className="flex items-center h-24 flex-row p-2">
+    <div className="w-[200px] md:w-[250px] bg-white rounded-lg shadow-xl ring-2 ring-blue-400 transform-gpu scale-105 opacity-95">
+      <div className="flex items-center h-20 md:h-24 flex-row p-2">
         <div className="place-img w-1/3 h-full">
           {img && (
             <Image

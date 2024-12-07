@@ -167,8 +167,8 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
       onDragStart={handleDragStart}
       sensors={sensors}
     >
-      <div className="flex w-screen -ml-4 md:ml-0 md:w-full h-[90vh] rounded-none md:rounded-lg overflow-visible   flex-row ">
-        <div className="box1  min-w-[150px] w-1/5 h-full flex-col flex rounded-l-lg:none md:rounded-l-lg overflow-hidden">
+      <div className="flex  -mx-4 w-[100vw]  md:ml-0 md:w-full h-[90vh] rounded-none md:rounded-lg overflow-visible   flex-row ">
+        <div className="box1  w-[150px] md:w-1/5 h-full flex-col flex rounded-l-lg:none md:rounded-l-lg overflow-hidden">
           {tripInfo ? (
             <div className="w-full bg-white h-[7%] lg:h-[15%] overflow-y-auto flex flex-col justify-around items-center">
               <p className=" font-bold w-[80%]  text-base md:text-xl mt-1 text-center truncate capitalize">
@@ -242,7 +242,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
             </div>
           </div>
         </div>
-        <div className="box2 h-full w-full md:w-4/5 ">
+        <div className="box2 h-full w-[calc(100vw-150px)] md:w-4/5 ">
           {tripInfo && <SchedulePage ref={scheduleRef} trip={tripInfo} />}
         </div>
         <DragOverlay
