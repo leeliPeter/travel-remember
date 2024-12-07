@@ -71,7 +71,7 @@ export default function ReadOnlySchedule({
   );
 
   return (
-    <div className="w-full relative h-full overflow-x-auto p-0  md:p-2 xl:p-3">
+    <div className="w-full h-full relative  overflow-x-auto p-0  md:p-2 xl:p-3">
       <div className="flex h-full space-x-0 md:space-x-4 min-w-fit">
         {tripDates.map((date, index) => {
           const dayId = `day-${index}`;

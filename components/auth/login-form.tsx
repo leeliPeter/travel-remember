@@ -19,7 +19,7 @@ import { Button } from "../ui/button";
 import FormSuccess from "../form-sucess";
 import FormError from "../form-error";
 import { login } from "@/actions/login";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -41,6 +41,36 @@ export default function LoginForm() {
       code: "",
     },
   });
+  const [digits, setDigits] = useState<string[]>(Array(6).fill(""));
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  const setRef = (index: number) => (el: HTMLInputElement | null) => {
+    inputRefs.current[index] = el;
+  };
+
+  const handleDigitChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+
+    const newDigits = [...digits];
+    newDigits[index] = value;
+    setDigits(newDigits);
+
+    form.setValue("code", newDigits.join(""));
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Backspace" && !digits[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
@@ -76,13 +106,23 @@ export default function LoginForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Two factor code</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Two factor code"
-                        disabled={isPending}
-                      />
-                    </FormControl>
+                    <div className="flex justify-between gap-2">
+                      {[0, 1, 2, 3, 4, 5].map((index) => (
+                        <input
+                          key={index}
+                          ref={setRef(index)}
+                          type="text"
+                          maxLength={1}
+                          value={digits[index]}
+                          onChange={(e) =>
+                            handleDigitChange(index, e.target.value)
+                          }
+                          onKeyDown={(e) => handleKeyDown(index, e)}
+                          className="w-12 h-12 text-center text-xl font-semibold border rounded-lg focus:border-2 focus:border-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={isPending}
+                        />
+                      ))}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -53,10 +53,10 @@ export default function PublicShare() {
   }
 
   return (
-    <div className="w-auto h-[100vh] bg-gray-200">
-      <div className="w-full h-full px-2 flex justify-center items-center py-0 md:py-2">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="p-2 border-b">
+    <div className="w-auto h-auto bg-gray-200">
+      <div className="w-full h-[100vh] px-2 flex justify-center items-center py-0 md:py-2">
+        <div className="bg-white  rounded-lg shadow-sm overflow-hidden">
+          <div className="p-2 h-[8vh] border-b">
             <div className="flex flex-row items-center justify-between">
               <h2 className=" text-sm md:text-2xl font-bold truncate">
                 {tripInfo.name}
@@ -73,7 +73,7 @@ export default function PublicShare() {
               </p>
             )}
           </div>
-          <div className="h-[90vh] overflow-hidden">
+          <div className="h-[92vh] overflow-hidden">
             <ReadOnlySchedule trip={tripInfo} isPublic={true} />
           </div>
         </div>
