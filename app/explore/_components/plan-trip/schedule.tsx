@@ -552,11 +552,11 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   };
 
   return (
-    <div className="relative w-[calc(100vw-150px)] md:w-full h-full">
+    <div className="relative w-[calc(100vw-150px)]  md:w-full h-full">
       <style jsx>{pulseAnimation}</style>
       <Button
         onClick={handleManualSave}
-        className="absolute -top-10 md:top-[84px] right-12 md:right-1  z-20 bg-sky-200 rounded-full p-2 md:p-4 h-auto w-auto"
+        className="absolute -top-10 md:-top-14 right-12  md:right-20  z-20 bg-sky-200 rounded-full p-2 md:p-4 h-auto w-auto"
       >
         <div className="reminder-container absolute top-0 right-4">
           {isEdited && (
@@ -574,44 +574,45 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           style={{ transform: "scale(1.9)" }}
         />
       </Button>
-      <div className="group absolute -top-10 md:top-2 z-20 right-1">
+      <div className="group absolute -top-10 md:-top-14  z-20 right-1">
         <div
           onClick={handleShare}
           className="rounded-full cursor-pointer bg-green-400 p-1 md:p-3 transition-scale duration-1000  "
         >
           <FaShareSquare className="w-6 h-6 text-white" />
         </div>
-        <div className="absolute right-0 mt-2 w-40 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
+        <div className="absolute right-0 mt-2 w-40 scale-0 transition-all rounded-lg  bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
           Share with your friends
           <div className="absolute right-5 -top-1 h-2 w-2 rotate-45 bg-gray-800"></div>
         </div>
       </div>
+      <div className="rounded-lg h-full overflow-hidden">
+        <div className="w-full relative h-full overflow-x-auto  md:rounded-r-lg  overflow-hidden bg-gray-100/70 p-1 md:p-3">
+          <div className="flex h-full space-x-1 md:space-x-4 min-w-fit">
+            {tripDates.map((date, index) => {
+              const dayId = `day-${index}`;
+              const daySchedule = daySchedules.find((s) => s.dayId === dayId);
 
-      <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-1 md:p-3">
-        <div className="flex h-full space-x-1 md:space-x-4 min-w-fit">
-          {tripDates.map((date, index) => {
-            const dayId = `day-${index}`;
-            const daySchedule = daySchedules.find((s) => s.dayId === dayId);
-
-            return (
-              <Day
-                key={dayId}
-                id={dayId}
-                date={date.toLocaleDateString("en-US", {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                })}
-                locations={daySchedule?.locations || []}
-                onTimeChange={handleTimeUpdate}
-                onWayToCommuteChange={handleWayToCommuteChange}
-                tripId={trip.id}
-                onLocationDeleted={(locationId) =>
-                  handleLocationDeleted(dayId, locationId)
-                }
-              />
-            );
-          })}
+              return (
+                <Day
+                  key={dayId}
+                  id={dayId}
+                  date={date.toLocaleDateString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                  locations={daySchedule?.locations || []}
+                  onTimeChange={handleTimeUpdate}
+                  onWayToCommuteChange={handleWayToCommuteChange}
+                  tripId={trip.id}
+                  onLocationDeleted={(locationId) =>
+                    handleLocationDeleted(dayId, locationId)
+                  }
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

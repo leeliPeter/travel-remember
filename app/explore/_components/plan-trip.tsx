@@ -167,8 +167,8 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
       onDragStart={handleDragStart}
       sensors={sensors}
     >
-      <div className="flex w-screen -ml-4 md:ml-0 md:w-full h-[90vh] rounded-none md:rounded-lg overflow-visible  md:overflow-hidden flex-row ">
-        <div className="box1  min-w-[150px] w-1/5 h-full flex-col flex">
+      <div className="flex w-screen -ml-4 md:ml-0 md:w-full h-[90vh] rounded-none md:rounded-lg overflow-visible   flex-row ">
+        <div className="box1  min-w-[150px] w-1/5 h-full flex-col flex rounded-l-lg:none md:rounded-l-lg overflow-hidden">
           {tripInfo ? (
             <div className="w-full bg-white h-[7%] lg:h-[15%] overflow-y-auto flex flex-col justify-around items-center">
               <p className=" font-bold w-[80%]  text-base md:text-xl mt-1 text-center truncate capitalize">
@@ -202,7 +202,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
                   {lists.map((list) => (
                     <div key={list.id} className="flex flex-col">
                       <div
-                        className="bg-white rounded-lg p-2 sm:p-3 hover:bg-gray-50 transition-colors group cursor-pointer sticky top-0 z-10 shadow-sm"
+                        className="bg-white  p-2 sm:p-3 hover:bg-gray-50 transition-colors group cursor-pointer sticky top-0 z-10 shadow-sm"
                         onClick={() => handleListClick(list)}
                       >
                         <div className="flex justify-between items-center">
@@ -242,7 +242,7 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
             </div>
           </div>
         </div>
-        <div className="box2 h-full w-full md:w-4/5">
+        <div className="box2 h-full w-full md:w-4/5 ">
           {tripInfo && <SchedulePage ref={scheduleRef} trip={tripInfo} />}
         </div>
         <DragOverlay
