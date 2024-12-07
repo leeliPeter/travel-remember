@@ -180,7 +180,7 @@ function CommuteTime({
           </SelectItem>
         </SelectContent>
       </Select>
-      <div className="p-0.5 bg-blue-200 rounded-full mt-0.5 -mb-0.5"></div>
+      <div className="p-0.5 hidden lg:block bg-blue-200 rounded-full mt-0.5 -mb-0.5"></div>
       <div className="flex items-center gap-1 text-sm">
         {commuteTime || "Calculating..."}
       </div>

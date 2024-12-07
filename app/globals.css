@@ -105,6 +105,12 @@ header > * {
   background-position: center;
   background-repeat: no-repeat;
 }
+@media (max-width: 768px) {
+  .trip-page,
+  .explore-page {
+    background-image: url("/images/backpack.jpg");
+  }
+}
 .trip-page::before,
 .explore-page::before {
   content: "";

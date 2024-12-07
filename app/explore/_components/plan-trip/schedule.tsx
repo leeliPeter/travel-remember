@@ -543,7 +543,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-[calc(100vw-150px)] md:w-full h-full">
       <style jsx>{pulseAnimation}</style>
       <Button
         onClick={handleManualSave}
