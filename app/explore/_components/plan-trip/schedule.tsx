@@ -17,7 +17,6 @@ import { RiSave3Line } from "react-icons/ri";
 import { getScheduleByTripId } from "@/data/get-scheduleby-tripId";
 import InvalidSchedule from "./invalid-schedule";
 import { FaShareSquare } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 
 interface DaySchedule {
   dayId: string;
@@ -55,7 +54,6 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const pendingChangesRef = useRef(false);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
-  const router = useRouter();
 
   // Add this function to generate a unique ID
   const generateUniqueId = () => {
