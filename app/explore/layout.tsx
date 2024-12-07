@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import Link from "next/link";
-import { useSearchParams, usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Toaster } from "sonner";
 
 interface ExploreLayoutProps {
@@ -13,7 +13,6 @@ export default function ExploreLayout({ children }: ExploreLayoutProps) {
   const searchParams = useSearchParams();
   const currentView = searchParams.get("view") || "search";
   const tripId = searchParams.get("tripId");
-  const pathname = usePathname();
 
   // Determine margin based on current view
   const navMargin = currentView === "plan" ? "mr-20" : "mr-auto";
