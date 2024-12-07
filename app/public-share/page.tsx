@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getPublicTrip } from "@/actions/get-trip-no-login";
 import Loading from "@/components/loading";
-import ReadOnlySchedule from "@/app/explore/_components/share/readonly-schedule";
+import ReadOnlySchedule from "./_components/share/readonly-schedule";
 import PublicInvalidSchedule from "./_components/public-invalid-schedule";
 
 export default function PublicShare() {
@@ -54,19 +54,23 @@ export default function PublicShare() {
 
   return (
     <div className="w-auto h-[100vh] bg-gray-200">
-      <div className="w-full h-full px-2 py-2">
+      <div className="w-full h-full px-2 flex justify-center items-center py-0 md:py-2">
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="p-2 border-b">
             <div className="flex flex-row items-center justify-between">
-              <h2 className="text-2xl font-bold">{tripInfo.name}</h2>
-              <div className="flex items-center text-gray-600">
+              <h2 className=" text-sm md:text-2xl font-bold truncate">
+                {tripInfo.name}
+              </h2>
+              <div className="flex text-xs md:text-base space-x-1 md:space-x-2 items-center text-gray-600">
                 <p>{new Date(tripInfo.startDate).toLocaleDateString()}</p>
                 <p className="mx-2">-</p>
                 <p>{new Date(tripInfo.endDate).toLocaleDateString()}</p>
               </div>
             </div>
             {tripInfo.description && (
-              <p className="mt-0 text-gray-500">{tripInfo.description}</p>
+              <p className="mt-0 text-gray-500 truncate">
+                {tripInfo.description}
+              </p>
             )}
           </div>
           <div className="h-[90vh] overflow-hidden">

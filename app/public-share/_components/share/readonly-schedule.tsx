@@ -3,7 +3,7 @@ import ReadOnlyDay from "./readonly-day";
 import { getScheduleByTripId } from "@/data/get-scheduleby-tripId";
 import { getPublicSchedule } from "@/actions/get-schedule-no-login";
 import { useEffect, useState } from "react";
-import InvalidSchedule from "../plan-trip/invalid-schedule";
+import PublicInvalidSchedule from "../public-invalid-schedule";
 
 interface ReadOnlyScheduleProps {
   trip: Trip;
@@ -44,7 +44,7 @@ export default function ReadOnlySchedule({
   }, [trip.id, isPublic]);
 
   if (scheduleError) {
-    return <InvalidSchedule />;
+    return <PublicInvalidSchedule />;
   }
 
   const getDatesInRange = (startDate: Date, endDate: Date) => {
@@ -71,8 +71,8 @@ export default function ReadOnlySchedule({
   );
 
   return (
-    <div className="w-full relative h-full overflow-x-auto  p-3">
-      <div className="flex h-full space-x-4 min-w-fit">
+    <div className="w-full relative h-full overflow-x-auto p-0  md:p-2 xl:p-3">
+      <div className="flex h-full space-x-0 md:space-x-4 min-w-fit">
         {tripDates.map((date, index) => {
           const dayId = `day-${index}`;
           const daySchedule = daySchedules.find((s) => s.dayId === dayId);

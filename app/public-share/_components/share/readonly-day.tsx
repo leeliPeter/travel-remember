@@ -20,7 +20,7 @@ export default function ReadOnlyDay({ date, locations }: ReadOnlyDayProps) {
           {locations.map((location, index) => (
             <div key={location.id}>
               {index !== 0 && locations[index - 1] && (
-                <div className="w-full flex flex-col items-center py-2">
+                <div className="w-full flex flex-col items-center py-0 md:py-2">
                   <ReadOnlyCommuteTime
                     origin={{
                       lat: Number(locations[index - 1].lat),

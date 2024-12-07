@@ -8,12 +8,12 @@ export default function InvalidSchedule() {
   const router = useRouter();
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100/70 rounded-lg">
-      <div className="text-center space-y-4 p-6 bg-white rounded-lg shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-800">
+    <div className=" w-full h-full flex flex-col items-center justify-center bg-gray-100/70 rounded-lg">
+      <div className="text-center w-80 md:w-auto space-y-4 p-4 md:p-6 bg-white rounded-lg shadow-sm">
+        <h3 className=" text-md md:text-lg font-semibold text-gray-800">
           Schedule Unavailable
         </h3>
-        <p className="text-gray-500">
+        <p className="text-gray-500 text-sm md:text-base">
           Unable to load the schedule. The trip ID might be incorrect or you may
           not have access to this trip.
         </p>
@@ -22,7 +22,7 @@ export default function InvalidSchedule() {
           className="mt-4 flex items-center gap-2"
           variant="outline"
         >
-          <IoMdArrowRoundBack className="w-4 h-4" />
+          <IoMdArrowRoundBack className="w-4 h-4 " />
           Back to My Trips
         </Button>
       </div>

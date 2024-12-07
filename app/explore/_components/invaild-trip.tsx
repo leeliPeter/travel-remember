@@ -8,7 +8,7 @@ export default function InvalidTrip() {
         <div className="space-y-4">
           <div className="relative">
             <svg
-              className="w-20 h-20 text-red-500 mx-auto animate-pulse"
+              className="w-16 h-16 md:w-18 md:h-18 text-red-500 mx-auto animate-pulse"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -24,14 +24,14 @@ export default function InvalidTrip() {
             <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-red-100 rounded-full opacity-50" />
           </div>
 
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+          <h2 className="text-md md:text-xl lg:text-2xl font-bold text-gray-900 tracking-tight">
             Oops! No Trip Selected
           </h2>
 
-          <div className="bg-gray-50 p-2 md:p-4 rounded-lg">
-            <p className="text-gray-600 leading-relaxed">
+          <div className="bg-gray-50 text-sm md:text-base p-2 md:p-4 rounded-lg">
+            <p className="text-gray-600  leading-relaxed">
               It looks like you haven't selected a trip yet!
-              <span className="block mt-2 text-sm">
+              <span className="block mt-2  text-sm">
                 Head over to "My Trips" to choose a trip and start planning your
                 adventure.
               </span>
@@ -41,13 +41,13 @@ export default function InvalidTrip() {
 
         <div className="space-y-4">
           <Link href="/mytrips" className="block">
-            <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-4 md:py-6 text-lg transition-all duration-200 transform hover:scale-[1.02] shadow-md hover:shadow-lg">
+            <Button className="w-full text-sm md:text-base lg:text-lg bg-blue-500 hover:bg-blue-600 text-white py-4 md:py-6 transition-all duration-200 transform hover:scale-[1.02] shadow-md hover:shadow-lg">
               <span className="mr-2">🎯</span>
               Go to My Trips
             </Button>
           </Link>
 
-          <p className="text-sm text-gray-500">
+          <p className="text-sm underline text-gray-500">
             <Link href="https://www.instagram.com/leelitam">
               Need help? Contact our support team
             </Link>

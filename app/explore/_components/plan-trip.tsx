@@ -198,15 +198,15 @@ export default function PlanTrip({ tripId }: { tripId: string | null }) {
                 Lists
               </div>
               {lists.length > 0 ? (
-                <div className="space-y-2 max-h-full  overflow-y-auto">
+                <div className="space-y-2 max-h-full rounded-lg   overflow-y-auto">
                   {lists.map((list) => (
                     <div key={list.id} className="flex flex-col">
                       <div
-                        className="bg-white  p-2 sm:p-3 hover:bg-gray-50 transition-colors group cursor-pointer sticky top-0 z-10 shadow-sm"
+                        className="bg-white  p-2 sm:p-3 hover:bg-gray-50 rounded-lg  transition-colors group cursor-pointer sticky top-0 z-10 shadow-sm"
                         onClick={() => handleListClick(list)}
                       >
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs sm:text-sm md:text-base font-medium truncate pr-8">
+                        <div className="flex justify-between items-center ">
+                          <span className="text-xs sm:text-sm md:text-base font-medium  truncate pr-8">
                             {list.name}
                           </span>
                           <div className="flex items-center space-x-1 sm:space-x-2">

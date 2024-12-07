@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { deleteList } from "@/actions/delete-list";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
+import InvalidTrip from "./invaild-trip";
 import { FaAnglesRight } from "react-icons/fa6";
 import {
   AlertDialog,
@@ -26,7 +27,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteLocation } from "@/actions/del-location";
 import Loading from "@/components/loading";
-import InvalidTrip from "./invaild-trip";
 
 interface Location {
   id: string;
@@ -334,7 +334,7 @@ export default function SearchLocation() {
             </p>
           </div>
         ) : (
-          <div className="w-full bg-white  h-[15%] overflow-y-auto justify-center  font-bold flex  flex-col items-center">
+          <div className="w-full bg-white truncate  h-[15%] overflow-y-auto justify-center  font-bold flex  flex-col items-center">
             Create a trip first
           </div>
         )}
@@ -453,7 +453,7 @@ export default function SearchLocation() {
 
           {/* Create List Form */}
           <div className="w-full">
-            <div className="text-base sm:text-md md:text-lg font-bold py-1">
+            <div className="text-base sm:text-md truncate md:text-lg font-bold py-1">
               Create New List
             </div>
             <div className="bg-white/90 rounded-lg w-full flex justify-center items-center">
@@ -482,11 +482,15 @@ export default function SearchLocation() {
         </div>
       </div>
       <div className="box2 w-full h-full bg-white">
-        <Map
-          lists={lists}
-          onLocationAdded={handleLocationAdded}
-          key={lists.length}
-        />
+        {tripInfo ? (
+          <Map
+            lists={lists}
+            onLocationAdded={handleLocationAdded}
+            key={lists.length}
+          />
+        ) : (
+          <InvalidTrip />
+        )}
       </div>
     </div>
   );
