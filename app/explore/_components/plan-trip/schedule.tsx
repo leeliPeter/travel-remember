@@ -565,8 +565,8 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
           style={{ transform: "scale(2.0)" }}
         />
       </Button>
-      <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-3">
-        <div className="flex h-full space-x-4 min-w-fit">
+      <div className="w-full relative h-full overflow-x-auto bg-gray-100/70 p-1 md:p-3">
+        <div className="flex h-full space-x-1 md:space-x-4 min-w-fit">
           {tripDates.map((date, index) => {
             const dayId = `day-${index}`;
             const daySchedule = daySchedules.find((s) => s.dayId === dayId);

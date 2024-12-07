@@ -185,8 +185,8 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
 
           content.innerHTML = `
             <div class="p-0 min-w-[170px] max-w-[260px]">
-              <div class="flex flex-col space-y-2">
-                <div class="relative h-[34px] w-[85%]" id="dropdownContainer">
+              <div class="flex flex-col space-y-0 md:space-y-2">
+                <div class="relative mb-2 md:mb-0  h-[34px] w-[85%]" id="dropdownContainer">
                   <button
                     id="addToListBtn"
                     class="w-full px-4 absolute top-2 left-0 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center gap-2"
@@ -195,7 +195,7 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
                     Add to List
                   </button>
                   
-                  <div id="listSelectContainer" class="hidden absolute top-full left-0 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-[9999]">
+                  <div id="listSelectContainer" class="hidden  absolute top-full left-0 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-[9999]">
                     <div class="py-1">
                       ${
                         lists.length > 0
@@ -219,11 +219,11 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
 
                 ${
                   photoUrl
-                    ? `<div class="mb-2">
+                    ? `<div class="mb-2  ">
                         <img 
                           src="${photoUrl}"
                           alt="${place.name || ""}"
-                          class="w-full h-48 object-cover rounded-lg"
+                          class="w-full h-28 lg:h-40 object-cover rounded-lg"
                           onerror="this.onerror=null; this.src='/images/emptyImage.jpg';"
                         />
                       </div>`

@@ -231,9 +231,9 @@ export default function Day({
   return (
     <div
       ref={setNodeRef}
-      className={`h-full w-[280px]  border-2 overflow-y-auto ${
+      className={`h-full w-[210px] md:w-[280px]   border-0 md:border-1 p-0 lg:border-2 overflow-y-auto ${
         isOver ? "border-blue-400 bg-blue-50" : "border-gray-200 bg-white"
-      } flex flex-col items-center p-2 rounded-lg transition-colors`}
+      } flex flex-col  items-center p-0 pt-2 md:p-2 rounded-lg transition-colors`}
     >
       <div className="date font-bold text-gray-800 mb-3">{date}</div>
       <div className="w-full min-h-[100px]">

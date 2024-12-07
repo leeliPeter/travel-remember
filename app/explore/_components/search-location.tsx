@@ -426,8 +426,8 @@ export default function SearchLocation() {
                               {location.photoUrl && (
                                 <Image
                                   src={location.photoUrl}
-                                  width={200}
-                                  height={200}
+                                  width={150}
+                                  height={150}
                                   alt={location.name}
                                   className="w-full hidden xl:block h-16 sm:h-24 object-cover rounded-md mt-2"
                                   onError={(e) => {

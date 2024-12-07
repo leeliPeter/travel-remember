@@ -214,7 +214,7 @@ export default function LocationBox({
       {...attributes}
       {...modifiedListeners}
       className={`
-        location-box mx-auto w-full max-w-[260px] bg-gray-200 rounded-lg 
+        location-box mx-auto  w-[205px] md:w-[250px] bg-gray-200 rounded-lg 
         transition-all duration-300 ease-in-out cursor-move
         ${
           isDragging
@@ -224,7 +224,7 @@ export default function LocationBox({
         ${isOver ? "ring-2 ring-blue-400 scale-[1.02]" : ""}
       `}
     >
-      <div className="flex items-center relative h-24 flex-row p-2">
+      <div className="flex items-center relative h-[90px] md:h-24 flex-row p-0 md:p-2">
         <div className="absolute top-2 text-gray-500 right-2 delete-button">
           <IoMdClose
             className="cursor-pointer hover:text-red-500 transition-colors"
@@ -244,7 +244,7 @@ export default function LocationBox({
           )}
         </div>
         <div className="place-info text-xs flex flex-col justify-between pl-1 space-y-1 w-2/3">
-          <div className="arrive-time flex items-center pl-2   justify-start space-x-4 text-gray-500">
+          <div className="arrive-time flex items-center pl-0 md:pl-2   justify-start space-x-1 md:space-x-4 text-gray-500">
             <div className="text-xs">Arrive:</div>
             <Button
               variant="outline"
@@ -259,7 +259,7 @@ export default function LocationBox({
             </Button>
           </div>
           <div className="place-name text-sm font-medium truncate">{name}</div>
-          <div className="departure-time flex items-center pl-2  justify-start space-x-3 text-gray-500">
+          <div className="departure-time flex items-center pl-0 md:pl-2  justify-start space-x-0 md:space-x-4 text-gray-500">
             <div className="text-xs">Depart:</div>
             <Button
               variant="outline"
