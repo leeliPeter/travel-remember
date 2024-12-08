@@ -563,7 +563,7 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
             transform: rotateX(180deg);
           }
           .scrollbar-always-visible::-webkit-scrollbar {
-            height: 8px;
+            height: 9px;
             display: block;
             position: sticky;
             top: 0;
@@ -573,11 +573,13 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
             border-radius: 4px;
           }
           .scrollbar-always-visible::-webkit-scrollbar-thumb {
-            background: #888;
+            background: #a2bbc8;
+            height: 9x;
             border-radius: 4px;
+            cursor: pointer;
           }
           .scrollbar-always-visible::-webkit-scrollbar-thumb:hover {
-            background: #666;
+            background: #677997;
           }
         }
 

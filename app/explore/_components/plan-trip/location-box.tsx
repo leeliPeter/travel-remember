@@ -60,22 +60,22 @@ function TimePickerDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-[340px] rounded-lg md:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
             Select the time by choosing hour and minute
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 py-4">
+        <div className="grid grid-cols-2 gap-4 py-1 md:py-4">
           <div className="flex flex-col items-center">
             <label className="text-sm font-medium mb-2">Hour</label>
             <div className="h-48 overflow-y-auto border rounded-lg">
               {hours.map((hour) => (
                 <div
                   key={hour}
-                  className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
-                    hour === selectedHour ? "bg-blue-100" : ""
+                  className={`px-4 py-2 cursor-pointer hover:bg-blue-200 ${
+                    hour === selectedHour ? "bg-blue-200" : ""
                   }`}
                   onClick={() => setSelectedHour(hour)}
                 >
@@ -90,8 +90,8 @@ function TimePickerDialog({
               {minutes.map((minute) => (
                 <div
                   key={minute}
-                  className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
-                    minute === selectedMinute ? "bg-blue-100" : ""
+                  className={`px-4 py-2 cursor-pointer hover:bg-blue-200 ${
+                    minute === selectedMinute ? "bg-blue-200" : ""
                   }`}
                   onClick={() => setSelectedMinute(minute)}
                 >
