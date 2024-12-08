@@ -19,7 +19,7 @@ import { Button } from "../ui/button";
 import FormSuccess from "../form-sucess";
 import FormError from "../form-error";
 import { login } from "@/actions/login";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -103,7 +103,7 @@ export default function LoginForm() {
               <FormField
                 control={form.control}
                 name="code"
-                render={({ field }) => (
+                render={({}) => (
                   <FormItem>
                     <FormLabel>Two factor code</FormLabel>
                     <div className="flex justify-between gap-2">
