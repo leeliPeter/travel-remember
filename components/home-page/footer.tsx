@@ -37,7 +37,7 @@ export default function footer() {
             <Link href="https://www.linkedin.com/in/lei-ieong-tam-6602a92bb/">
               <GrLinkedin className="text-white text-2xl  hover:text-gray-400" />
             </Link>
-            <Link href="/https://www.facebook.com/leeli.tam/">
+            <Link href="https://www.facebook.com/leeli.tam/">
               <ImFacebook2 className="text-white text-2xl hover:text-gray-400" />
             </Link>
           </ul>
