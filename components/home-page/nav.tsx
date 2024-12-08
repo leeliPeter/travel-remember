@@ -202,7 +202,7 @@ export default function Nav({ user }: NavProps) {
             >
               My Trips
             </Link>
-            <div className="group-hover:w-[80%] max-w-[100px] w-0 text-center duration-500 border-b-2 border-white mx-2"></div>
+            <div className="group-hover:w-[80%] max-w-[80px] w-0 text-center duration-500 border-b-2 border-white mx-2"></div>
           </li>
         </ul>
         {!user ? (
@@ -214,7 +214,7 @@ export default function Nav({ user }: NavProps) {
               Sign Up
             </Button>
             <Button
-              className="bg-black w-40 hover:bg-white hover:text-black  py-4 rounded-full text-white"
+              className="bg-black w-40 hover:bg-white hover:text-black rounded-full text-white"
               onClick={() => handleNavigation("/auth/login")}
             >
               Login
