@@ -51,8 +51,11 @@ export default function RegisterForm() {
       showSocial={true}
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4 md:space-y-6"
+        >
+          <div className="space-y-1 md:space-y-2 lg:space-y-4">
             <FormField
               control={form.control}
               name="name"

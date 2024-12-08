@@ -19,11 +19,24 @@ const emailTemplate = (content: string) => `
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     ">
       <div style="text-align: center; margin-bottom: 20px;">
+        <img 
+          src="${domain}/images/icon.jpg"
+          alt="Plan Travel Logo"
+          style="
+            width: 120px;
+            height: 120px;
+            margin-bottom: 16px;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 4px solid #ffffff;
+          "
+        />
         <h1 style="
           color: #1a1a1a;
-          font-size: 24px;
+          font-size: 28px;
           margin: 0;
           padding: 0;
+          font-weight: bold;
         ">Plan Travel</h1>
       </div>
       ${content}
@@ -32,10 +45,20 @@ const emailTemplate = (content: string) => `
         padding-top: 20px;
         border-top: 1px solid #eaeaea;
         text-align: center;
-        color: #666;
-        font-size: 12px;
       ">
-        <p>This email was sent from Plan Travel. Please do not reply to this email.</p>
+        <img 
+          src="${domain}/images/icon.jpg"
+          alt="Plan Travel"
+          style="
+            width: 40px;
+            height: 40px;
+            margin-bottom: 12px;
+            border-radius: 50%;
+          "
+        />
+        <p style="color: #666; font-size: 12px;">
+          This email was sent from Plan Travel. Please do not reply to this email.
+        </p>
       </div>
     </div>
   </div>

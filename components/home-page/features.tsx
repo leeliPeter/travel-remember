@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Features() {
   return (
-    <div className="container pb-28 md:pt-20 max-w-6xl flex flex-col space-y-20  mx-auto p-6">
+    <div className="container pb-28 pt-0 md:pt-16  max-w-6xl flex flex-col space-y-20  mx-auto p-6">
       <h1 className="text-5xl text-center md:text-start font-medium md:pl-10 ">
         Features
       </h1>

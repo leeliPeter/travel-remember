@@ -97,16 +97,19 @@ export default function LoginForm() {
       showSocial={true}
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-2 md:space-y-4"
+        >
+          <div className="space-y-2 md:space-y-4">
             {showTwoFactor && (
               <FormField
                 control={form.control}
                 name="code"
-                render={({}) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Two factor code</FormLabel>
-                    <div className="flex justify-between gap-2">
+                    <div className="flex justify-between gap-0 md:gap-2">
                       {[0, 1, 2, 3, 4, 5].map((index) => (
                         <input
                           key={index}
@@ -114,11 +117,14 @@ export default function LoginForm() {
                           type="text"
                           maxLength={1}
                           value={digits[index]}
-                          onChange={(e) =>
-                            handleDigitChange(index, e.target.value)
-                          }
+                          onChange={(e) => {
+                            handleDigitChange(index, e.target.value);
+                            field.onChange(digits.join(""));
+                          }}
                           onKeyDown={(e) => handleKeyDown(index, e)}
-                          className="w-12 h-12 text-center text-xl font-semibold border rounded-lg focus:border-2 focus:border-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                          onBlur={field.onBlur}
+                          name={`${field.name}-${index}`}
+                          className="w-10 h-10 md:w-12 md:h-12 text-center text-xl font-semibold border rounded-lg focus:border-2 focus:border-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={isPending}
                         />
                       ))}

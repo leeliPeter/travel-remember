@@ -13,7 +13,7 @@ export default function Social() {
   };
   return (
     <div className="flex w-full flex-col items-centergap-2">
-      <div className="relative py-2 sm:py-3">
+      <div className="relative py-1 sm:py-3">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>

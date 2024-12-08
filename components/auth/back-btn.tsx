@@ -9,7 +9,12 @@ interface BackBtnProps {
 
 export default function BackBtn({ label, href }: BackBtnProps) {
   return (
-    <Button variant="link" className="w-full font-normal" size={"sm"} asChild>
+    <Button
+      variant="link"
+      className="w-full -my-2 md:-my-0 font-normal"
+      size={"sm"}
+      asChild
+    >
       <Link href={href}>{label}</Link>
     </Button>
   );
