@@ -81,13 +81,13 @@ export default function Nav({ user }: NavProps) {
             <div className="hidden md:flex items-center mt-2 space-x-10">
               <>
                 <Button
-                  className="bg-white rounded-full hover:text-white text-black"
+                  className="bg-white rounded-full  hover:text-white text-black"
                   onClick={() => router.push("/auth/register")}
                 >
                   Sign Up
                 </Button>
                 <Button
-                  className="bg-black hover:bg-white hover:text-black px-4 py-2 rounded-full text-white"
+                  className="bg-black hover:bg-white hover:text-black  rounded-full text-white"
                   onClick={() => router.push("/auth/login")}
                 >
                   Login

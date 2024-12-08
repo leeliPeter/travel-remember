@@ -1,10 +1,22 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { ImFacebook2 } from "react-icons/im";
 import { GrInstagram, GrLinkedin } from "react-icons/gr";
+import { usePathname } from "next/navigation";
 
-export default function footer() {
+export default function Footer() {
+  const pathname = usePathname();
   const links = [{ href: "/mytrips", label: "My Trips" }];
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <footer className=" bg-black px-6 py-12">
       <div className="max-w-6xl container mx-auto space-y-10 md:space-y-0 flex flex-col md:flex-row items-center md:justify-between">
@@ -12,13 +24,23 @@ export default function footer() {
         <div className="flex flex-col md:justify-start space-y-8">
           {/* <img src="./images/logo.svg" className="w-40" alt="" /> */}
           <h2 className="text-4xl text-white font-bold">
-            <Link href="/">Travel</Link>
+            <Link
+              href="/"
+              onClick={(e) => {
+                if (pathname === "/") {
+                  e.preventDefault();
+                  scrollToTop();
+                }
+              }}
+            >
+              Travel
+            </Link>
           </h2>
           <ul className="flex flex-col space-y-4 items-center md:flex-row md:space-y-0 md:space-x-8 md:justify-start">
             {links.map(({ href, label }) => (
               <li
                 key={`${href}${label}`}
-                className="group  flex flex-col items-center gap-2"
+                className="group ml-0 md:ml-2  flex flex-col items-center gap-2"
               >
                 <Link className="text-white text-lg font-bold " href={href}>
                   {label}
