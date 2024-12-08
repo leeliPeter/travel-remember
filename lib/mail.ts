@@ -18,27 +18,17 @@ const emailTemplate = (content: string) => `
       border-radius: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     ">
-      <div style="width: 100%; text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <div style="text-align: center; margin-bottom: 20px;">
         <img 
-          src="${domain}/images/icon.jpg"
+          src="${domain}/images/black-logo.png"
           alt="Plan Travel Logo"
           style="
-            width: 80px;
-            height: 80px;
-            display: block;
+            width: auto;
+            height: 50px;
             margin-bottom: 16px;
             border-radius: 50%;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             border: 4px solid #ffffff;
-          "
-        />
-        <img
-          src="${domain}/images/black-logo.png"
-          alt="Travel"
-          style="
-            width: auto;
-            height: 50px;
-            display: block;
           "
         />
       </div>
