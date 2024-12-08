@@ -24,9 +24,7 @@ const emailTemplate = (content: string) => `
           alt="Plan Travel Logo"
           style="
             width: auto;
-            height: 50px;
-            margin-bottom: 16px;
-            border-radius: 50%;
+            height: 60px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             border: 4px solid #ffffff;
           "
