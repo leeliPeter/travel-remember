@@ -23,8 +23,8 @@ const emailTemplate = (content: string) => `
           src="${domain}/images/icon.jpg"
           alt="Plan Travel Logo"
           style="
-            width: 120px;
-            height: 120px;
+            width: 80px;
+            height: 80px;
             margin-bottom: 16px;
             border-radius: 50%;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
