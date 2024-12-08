@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { FaUser } from "react-icons/fa";
 import { ExtendedUser } from "@/next-auth";
+import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,7 +61,14 @@ export default function Nav({ user }: NavProps) {
           {/* left */}
           <div className="flex flex-row items-center space-x-16">
             <Link href="/">
-              <h2 className="text-4xl text-white font-bold">Travel</h2>
+              {/* <h2 className="text-4xl text-white font-bold">Travel</h2> */}
+              <Image
+                src="/images/logo.png"
+                alt="logo"
+                width={200}
+                height={200}
+                className="h-12 w-auto "
+              />
             </Link>
             <ul className="hidden md:flex items-center mt-6 space-x-10">
               {links.map(({ href, label }) => (
@@ -87,7 +95,7 @@ export default function Nav({ user }: NavProps) {
                   Sign Up
                 </Button>
                 <Button
-                  className="bg-black hover:bg-white hover:text-black  rounded-full text-white"
+                  className="bg-black hover:bg-white hover:text-black px-5 py-5 rounded-full text-white"
                   onClick={() => router.push("/auth/login")}
                 >
                   Login
@@ -206,7 +214,7 @@ export default function Nav({ user }: NavProps) {
               Sign Up
             </Button>
             <Button
-              className="bg-black w-40 hover:bg-white hover:text-black px-4 py-2 rounded-full text-white"
+              className="bg-black w-40 hover:bg-white hover:text-black  py-4 rounded-full text-white"
               onClick={() => handleNavigation("/auth/login")}
             >
               Login

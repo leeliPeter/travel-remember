@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ImFacebook2 } from "react-icons/im";
 import { GrInstagram, GrLinkedin } from "react-icons/gr";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export default function Footer() {
   const pathname = usePathname();
@@ -33,7 +34,13 @@ export default function Footer() {
                 }
               }}
             >
-              Travel
+              <Image
+                src="/images/logo.png"
+                alt="logo"
+                width={200}
+                height={200}
+                className="h-12 w-auto "
+              />
             </Link>
           </h2>
           <ul className="flex flex-col space-y-4 items-center md:flex-row md:space-y-0 md:space-x-8 md:justify-start">

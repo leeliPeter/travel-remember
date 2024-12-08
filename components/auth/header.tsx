@@ -16,7 +16,13 @@ export default function Header({ label }: HeaderProps) {
           height={100}
           className="w-10 h-10"
         />
-        <p className="text-2xl font-bold">Travel</p>
+        <Image
+          src="/images/black-logo.png"
+          alt="logo"
+          width={100}
+          height={100}
+          className="h-10 w-auto "
+        />
       </div>
       <p className="text-muted-foreground text-sm">{label}</p>
     </div>
