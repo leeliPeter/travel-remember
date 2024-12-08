@@ -11,8 +11,41 @@ const josefinSans = Josefin_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Travel",
-  description: "Plan your next trip",
+  title: {
+    default: "Plan Travel",
+    template: "%s | Plan Travel",
+  },
+  description:
+    "Plan Travel - Simplify your trip planning by searching locations, creating schedules with drag and drop, and collaborating with friends. Make your next adventure planning effortless and enjoyable.",
+  keywords: [
+    "trip planning",
+    "travel schedule",
+    "collaborative planning",
+    "drag and drop itinerary",
+    "location search",
+    "travel planner",
+  ],
+  authors: [{ name: "Lei Ieong Tam" }],
+  creator: "Lei Ieong Tam",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://www.theplantravel.com",
+    title: "Plan Travel - Smart Trip Planning Made Easy",
+    description:
+      "Plan Travel - Simplify your trip planning by searching locations, creating schedules with drag and drop, and collaborating with friends.",
+    siteName: "Plan Travel",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Plan Travel",
+    description:
+      "Smart trip planning with location search, drag & drop scheduling, and friend collaboration.",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+  },
 };
 
 export default async function RootLayout({
