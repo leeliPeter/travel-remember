@@ -53,9 +53,16 @@ export default function LoginForm() {
 
     const newDigits = [...digits];
     newDigits[index] = value;
+
     setDigits(newDigits);
 
-    form.setValue("code", newDigits.join(""));
+    const newCode = newDigits.join("");
+    console.log("New code:", newCode);
+
+    form.setValue("code", newCode, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
 
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
@@ -74,8 +81,17 @@ export default function LoginForm() {
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
+
+    const finalCode = digits.join("");
+    const finalValues = {
+      ...values,
+      code: finalCode,
+    };
+
+    console.log("Submitting with code:", finalCode);
+
     startTransition(() => {
-      login(values).then((data) => {
+      login(finalValues).then((data) => {
         if (data?.error) {
           setError(data.error);
         }
