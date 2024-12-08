@@ -3,6 +3,12 @@ import "./globals.css";
 import NavWrapper from "@/components/home-page/nav-wrapper";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import { Josefin_Sans } from "next/font/google";
+
+const josefinSans = Josefin_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Travel",
@@ -18,7 +24,7 @@ export default async function RootLayout({
 
   return (
     <SessionProvider session={session}>
-      <html lang="en">
+      <html lang="en" className={josefinSans.className}>
         <body>
           <div className="relative">
             <NavWrapper />

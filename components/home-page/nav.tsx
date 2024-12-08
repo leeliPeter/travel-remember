@@ -71,7 +71,7 @@ export default function Nav({ user }: NavProps) {
                   <Link className="text-white text-lg font-bold" href={href}>
                     {label}
                   </Link>
-                  <div className="group-hover:w-[80%] w-0 text-center duration-500 border-b-2 border-white mx-2"></div>
+                  <div className="group-hover:w-[80%] w-0  text-center duration-500 border-b-[3px] border-white mx-2"></div>
                 </li>
               ))}
             </ul>
@@ -194,7 +194,7 @@ export default function Nav({ user }: NavProps) {
             >
               My Trips
             </Link>
-            <div className="group-hover:w-[80%] w-0 text-center duration-500 border-b-2 border-white mx-2"></div>
+            <div className="group-hover:w-[80%] max-w-[100px] w-0 text-center duration-500 border-b-2 border-white mx-2"></div>
           </li>
         </ul>
         {!user ? (
