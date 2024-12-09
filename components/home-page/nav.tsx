@@ -166,7 +166,7 @@ export default function Nav({ user }: NavProps) {
 
       {/* Mobile menu */}
       <div
-        className={`md:hidden overflow-hidden absolute bg-gray-900/90 w-screen duration-500 inset-0 ease-in-out ${
+        className={`md:hidden overflow-hidden absolute bg-neutral-900 w-screen duration-500 inset-0 ease-in-out ${
           isMenuOpen ? "h-[430px]" : "h-0"
         }`}
       >

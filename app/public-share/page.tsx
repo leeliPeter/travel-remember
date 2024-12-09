@@ -93,9 +93,13 @@ export default function PublicShare() {
               </div>
             </div>
             <div className="flex flex-row  items-center justify-between">
-              {tripInfo.description && (
+              {tripInfo.description ? (
                 <p className="mt-0 text-gray-500 text-xs md:text-base truncate">
                   {tripInfo.description}
+                </p>
+              ) : (
+                <p className="mt-0 text-gray-500 text-xs md:text-base truncate">
+                  " "
                 </p>
               )}
               <div
