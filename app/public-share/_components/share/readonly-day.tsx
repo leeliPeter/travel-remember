@@ -13,7 +13,7 @@ interface ReadOnlyDayProps {
 
 export default function ReadOnlyDay({ date, locations }: ReadOnlyDayProps) {
   return (
-    <div className="h-full  w-[210px] md:w-[280px] 2xl:w-[300px]   border-0  md:border-2 overflow-y-auto border-gray-200 bg-white flex flex-col items-center p-2 rounded-lg">
+    <div className="h-full  w-[210px] md:w-[280px] 2xl:w-[300px]   border-0  md:border-2 overflow-y-auto border-gray-200 bg-white flex flex-col items-center px-2 rounded-lg">
       <div className="date font-bold text-gray-800 mb-3">{date}</div>
       <div className="w-full min-h-[100px]">
         <div className="space-y-2 pb-2">
