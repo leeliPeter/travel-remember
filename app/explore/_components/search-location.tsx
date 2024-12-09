@@ -466,7 +466,8 @@ export default function SearchLocation() {
                   placeholder="Enter list name"
                   value={listName}
                   onChange={(e) => setListName(e.target.value)}
-                  className="w-full text-xs sm:text-sm"
+                  className="w-full text-base sm:text-sm"
+                  style={{ fontSize: "16px" }}
                   disabled={isLoading || !tripId}
                 />
                 <Button
