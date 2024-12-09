@@ -22,7 +22,7 @@ export default function ExploreLayout({ children }: ExploreLayoutProps) {
       <div className="trip-page w-full pb-2 h-full min-h-screen pt-[68px] md:pt-[88px] ">
         <div className="mx-auto px-4">
           <div
-            className={`nav w-[70%] min-w-[250px] container ${navMargin} md:mr-auto text-sm md:text-base mx-auto h-11 md:h-12 bg-white/20 backdrop-blur-sm space-x-2 rounded-lg mb-2 md:mb-6 flex justify-between items-center px-2`}
+            className={`nav w-[70%] min-w-[250px] mt-2 md:mt-0 container ${navMargin} md:mr-auto text-sm md:text-base mx-auto h-11 md:h-12 bg-white/20 backdrop-blur-sm space-x-2 rounded-lg mb-2 md:mb-6 flex justify-between items-center px-2`}
           >
             <Link
               href={`/explore?view=search${tripId ? `&tripId=${tripId}` : ""}`}
