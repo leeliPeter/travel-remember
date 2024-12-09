@@ -81,7 +81,7 @@ export default function PublicShare() {
       <Toaster position="bottom-right" />
       <div className="w-full h-[100vh] px-2 flex justify-center items-center py-0 ">
         <div className="bg-white  rounded-lg shadow-sm overflow-hidden">
-          <div className="p-2 h-[8vh]  border-b md:border-b-0">
+          <div className="p-2 h-[8vh]  ">
             <div className="flex flex-row items-center justify-between">
               <h2 className=" text-sm md:text-2xl font-bold truncate">
                 {tripInfo.name}
