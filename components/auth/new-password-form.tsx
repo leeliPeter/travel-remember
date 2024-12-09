@@ -66,6 +66,8 @@ export default function ResetForm() {
                       type="password"
                       placeholder="Password"
                       disabled={isPending}
+                      className="text-base"
+                      style={{ fontSize: "16px" }}
                     />
                   </FormControl>
                   <FormMessage />

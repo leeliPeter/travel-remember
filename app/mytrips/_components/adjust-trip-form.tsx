@@ -99,7 +99,8 @@ export function AdjustTripForm({ trip, onSuccess }: AdjustTripFormProps) {
                     {...field}
                     disabled={isPending}
                     placeholder="Enter trip name"
-                    className="h-9 sm:h-10"
+                    className="h-9 sm:h-10 text-base"
+                    style={{ fontSize: "16px" }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs sm:text-sm" />
@@ -126,7 +127,8 @@ export function AdjustTripForm({ trip, onSuccess }: AdjustTripFormProps) {
                     }
                     onChange={(e) => field.onChange(new Date(e.target.value))}
                     disabled={isPending}
-                    className="h-9 sm:h-10"
+                    className="h-9 sm:h-10 text-base"
+                    style={{ fontSize: "16px" }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs sm:text-sm" />
@@ -151,7 +153,8 @@ export function AdjustTripForm({ trip, onSuccess }: AdjustTripFormProps) {
                     }
                     onChange={(e) => field.onChange(new Date(e.target.value))}
                     disabled={isPending}
-                    className="h-9 sm:h-10"
+                    className="h-9 sm:h-10 text-base"
+                    style={{ fontSize: "16px" }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs sm:text-sm" />
@@ -172,7 +175,8 @@ export function AdjustTripForm({ trip, onSuccess }: AdjustTripFormProps) {
                     {...field}
                     disabled={isPending}
                     placeholder="Enter trip description"
-                    className="resize-none h-20 sm:h-24"
+                    className="resize-none h-20 sm:h-24 text-base"
+                    style={{ fontSize: "16px" }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs sm:text-sm" />

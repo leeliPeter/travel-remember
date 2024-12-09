@@ -68,6 +68,8 @@ export default function RegisterForm() {
                       type="text"
                       placeholder="Peter"
                       disabled={isPending}
+                      className="text-base"
+                      style={{ fontSize: "16px" }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -85,6 +87,8 @@ export default function RegisterForm() {
                       {...field}
                       placeholder="Email"
                       disabled={isPending}
+                      className="text-base"
+                      style={{ fontSize: "16px" }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -103,6 +107,8 @@ export default function RegisterForm() {
                       type="password"
                       placeholder="Password"
                       disabled={isPending}
+                      className="text-base"
+                      style={{ fontSize: "16px" }}
                     />
                   </FormControl>
                   <FormMessage />

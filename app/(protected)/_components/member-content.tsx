@@ -235,10 +235,10 @@ export function MemberPage({ user }: MemberPageProps) {
                         <Input
                           value={user?.email || ""}
                           disabled
-                          className="bg-gray-100"
+                          className="bg-gray-100 text-base"
+                          style={{ fontSize: "16px" }}
                         />
                       </FormControl>
-                      {/* <FormDescription>Email cannot be changed</FormDescription> */}
                     </FormItem>
                   )}
                 />
@@ -255,6 +255,8 @@ export function MemberPage({ user }: MemberPageProps) {
                           {...field}
                           placeholder="Enter your name"
                           disabled={isPending}
+                          className="text-base"
+                          style={{ fontSize: "16px" }}
                         />
                       </FormControl>
                       <FormMessage />

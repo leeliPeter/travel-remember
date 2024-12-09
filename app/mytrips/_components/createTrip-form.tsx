@@ -99,7 +99,8 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
                     {...field}
                     disabled={loading}
                     placeholder="Enter trip name"
-                    className="h-9 sm:h-10"
+                    className="h-9 sm:h-10 text-base"
+                    style={{ fontSize: "16px" }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs sm:text-sm" />
@@ -130,7 +131,8 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
                       field.onChange(date);
                     }}
                     disabled={loading}
-                    className="h-9 sm:h-10"
+                    className="h-9 sm:h-10 text-base"
+                    style={{ fontSize: "16px" }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs sm:text-sm" />
@@ -159,7 +161,8 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
                       field.onChange(date);
                     }}
                     disabled={loading}
-                    className="h-9 sm:h-10"
+                    className="h-9 sm:h-10 text-base"
+                    style={{ fontSize: "16px" }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs sm:text-sm" />
@@ -180,7 +183,8 @@ export function CreateTripForm({ onSuccess }: CreateTripFormProps) {
                     {...field}
                     disabled={loading}
                     placeholder="Enter trip description"
-                    className="resize-none h-20 sm:h-24"
+                    className="resize-none h-20 sm:h-24 text-base"
+                    style={{ fontSize: "16px" }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs sm:text-sm" />

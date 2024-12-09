@@ -358,6 +358,8 @@ export default function Tripbox({
                     handleSearch();
                   }
                 }}
+                className="text-base"
+                style={{ fontSize: "16px" }}
               />
               <Button
                 onClick={handleSearch}

@@ -141,6 +141,7 @@ export default function LoginForm() {
                           onBlur={field.onBlur}
                           name={`${field.name}-${index}`}
                           className="w-10 h-10 md:w-12 md:h-12 text-center text-xl font-semibold border rounded-lg focus:border-2 focus:border-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                          style={{ fontSize: "16px" }}
                           disabled={isPending}
                         />
                       ))}
@@ -163,6 +164,8 @@ export default function LoginForm() {
                           {...field}
                           placeholder="Email"
                           disabled={isPending}
+                          className="text-base"
+                          style={{ fontSize: "16px" }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -181,6 +184,8 @@ export default function LoginForm() {
                           type="password"
                           placeholder="Password"
                           disabled={isPending}
+                          className="text-base"
+                          style={{ fontSize: "16px" }}
                         />
                       </FormControl>
                       <Button
