@@ -99,7 +99,7 @@ export default function PublicShare() {
                 </p>
               ) : (
                 <p className="mt-0 text-gray-500 text-xs md:text-base truncate">
-                  " "
+                  {" "}
                 </p>
               )}
               <div

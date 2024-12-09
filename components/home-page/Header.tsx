@@ -17,7 +17,7 @@ export default function Header() {
         <div className="md:hidden w-full flex justify-center">
           <Button
             onClick={() => router.push("/mytrips")}
-            className="px-6 py-6 bg-zinc-800 hover:bg-zinc-700 rounded-xl mt-20 font-bold text-lg
+            className="px-6 py-6 bg-zinc-800 hover:bg-zinc-700 rounded-xl mt-20 font-bold text-md
               transform transition-all duration-300 hover:scale-105 active:scale-95"
           >
             Get Started

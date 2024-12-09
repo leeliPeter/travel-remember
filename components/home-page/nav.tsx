@@ -167,7 +167,7 @@ export default function Nav({ user }: NavProps) {
       {/* Mobile menu */}
       <div
         className={`md:hidden overflow-hidden absolute bg-neutral-900 w-screen duration-500 inset-0 ease-in-out ${
-          isMenuOpen ? "h-[430px]" : "h-0"
+          isMenuOpen ? "h-[500px]" : "h-0"
         }`}
       >
         <ul className="flex flex-col items-around mt-20 space-y-6 w-full">
