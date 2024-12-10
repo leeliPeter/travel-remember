@@ -29,7 +29,7 @@ export default function Intro() {
   return (
     <div
       id="intro-section"
-      className="container max-w-6xl mx-auto px-6 relative
+      className="container max-w-6xl mx-auto px-6 relative 
           md:h-[530px] my-20 md:my-28 md:px-2 md:mb-40"
     >
       <div

@@ -61,7 +61,7 @@ export default async function RootLayout({
     <SessionProvider session={session}>
       <html lang="en" className={josefinSans.className}>
         <body>
-          <div className="relative ">
+          <div className="relative overflow-x-hidden ">
             <NavWrapper />
             {children}
           </div>
