@@ -67,7 +67,7 @@ export default function Nav({ user }: NavProps) {
                 alt="logo"
                 width={200}
                 height={200}
-                className="h-12 w-auto "
+                className="h-12 w-auto cursor-pointer "
               />
             </Link>
             <ul className="hidden md:flex items-center mt-6 space-x-10">
@@ -76,7 +76,10 @@ export default function Nav({ user }: NavProps) {
                   key={`${href}${label}`}
                   className="group flex flex-col items-center gap-2"
                 >
-                  <Link className="text-white text-lg font-bold" href={href}>
+                  <Link
+                    className="text-white text-lg font-bold cursor-pointer"
+                    href={href}
+                  >
                     {label}
                   </Link>
                   <div className="group-hover:w-[80%] w-0  text-center duration-500 border-b-[3px] border-white mx-2"></div>

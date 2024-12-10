@@ -295,7 +295,7 @@ export default function SearchLocation() {
       >
         <div
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="menu-button bg-gray-100 cursor-pointer text-black flex flex-col lowercase items-center rounded-r-lg p-2 text-sm"
+          className="menu-button bg-stone-600 cursor-pointer text-white flex flex-col lowercase items-center rounded-r-lg p-1 text-sm"
         >
           <FaAnglesRight
             className={`h-4 w-4 mb-1 transition-transform duration-500 ${
