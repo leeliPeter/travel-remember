@@ -9,6 +9,7 @@ interface AddLocationParams {
   lat: number;
   lng: number;
   photoUrl: string | null;
+  placeId: string;
   listId: string;
 }
 
@@ -46,6 +47,7 @@ export async function addLocation(params: AddLocationParams) {
         lat: params.lat,
         lng: params.lng,
         photoUrl: params.photoUrl,
+        placeId: params.placeId,
         listId: params.listId,
       },
     });

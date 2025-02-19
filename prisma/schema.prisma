@@ -119,6 +119,7 @@ model Location {
   lat           Float
   lng           Float
   photoUrl      String?
+  placeId       String?
   listId        String
   list          List      @relation(fields: [listId], references: [id], onDelete: Cascade)
   createdAt     DateTime  @default(now())

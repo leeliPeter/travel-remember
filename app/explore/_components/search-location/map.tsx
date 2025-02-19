@@ -60,24 +60,15 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
 
     setIsAddingLocation(true);
     try {
-      let photoUrl = null;
-      try {
-        photoUrl =
-          place.photos?.[0]?.getUrl({
-            maxWidth: 400,
-            maxHeight: 300,
-          }) || "/images/emptyImage.jpg";
-      } catch (error) {
-        console.error("Error getting photo URL:", error);
-        photoUrl = "/images/emptyImage.jpg";
-      }
-
       const locationData = {
         name: place.name || "",
         address: place.formatted_address || "",
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
-        photoUrl: photoUrl,
+        photoUrl:
+          place.photos?.[0]?.getUrl({ maxWidth: 400, maxHeight: 300 }) ||
+          "/images/emptyImage.jpg",
+        placeId: place.place_id || null,
         listId: listId,
       };
 
@@ -97,9 +88,9 @@ export default function Map({ lists, onLocationAdded }: MapProps) {
         toast.success(
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              {photoUrl && (
+              {locationData.photoUrl && (
                 <Image
-                  src={photoUrl}
+                  src={locationData.photoUrl}
                   width={40}
                   height={40}
                   alt={place.name || ""}

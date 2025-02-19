@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteLocation } from "@/actions/del-location";
 import Loading from "@/components/loading";
+import { useLocationPhoto } from "@/hooks/useLocationPhoto";
 
 interface Location {
   id: string;
@@ -38,6 +39,7 @@ interface Location {
   listId: string;
   createdAt: Date;
   updatedAt: Date;
+  placeId: string | null;
 }
 
 interface List {
@@ -60,6 +62,32 @@ interface TripInfo {
 // interface ListWithLocations extends List {
 //   locations: Location[];
 // }
+
+function LocationCard({ location }: { location: Location }) {
+  const photoUrl = useLocationPhoto(
+    location.placeId,
+    location.photoUrl || "/images/emptyImage.jpg"
+  );
+
+  return (
+    <div className="...">
+      {photoUrl && (
+        <Image
+          src={photoUrl}
+          width={150}
+          height={150}
+          alt={location.name}
+          className="w-full hidden xl:block h-16 sm:h-24 object-cover rounded-md mt-2"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.onerror = null;
+            target.src = "/images/emptyImage.jpg";
+          }}
+        />
+      )}
+    </div>
+  );
+}
 
 export default function SearchLocation() {
   const [listName, setListName] = useState("");
@@ -423,20 +451,7 @@ export default function SearchLocation() {
                               <div className="font-medium text-blue-600 pr-4 sm:pr-6 truncate">
                                 {location.name}
                               </div>
-                              {location.photoUrl && (
-                                <Image
-                                  src={location.photoUrl}
-                                  width={150}
-                                  height={150}
-                                  alt={location.name}
-                                  className="w-full hidden xl:block h-16 sm:h-24 object-cover rounded-md mt-2"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.onerror = null; // Prevent infinite loop
-                                    target.src = "/images/emptyImage.jpg";
-                                  }}
-                                />
-                              )}
+                              <LocationCard location={location} />
                             </div>
                           ))}
                         </div>
