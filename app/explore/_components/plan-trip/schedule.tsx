@@ -18,14 +18,16 @@ import { getScheduleByTripId } from "@/data/get-scheduleby-tripId";
 import InvalidSchedule from "./invalid-schedule";
 import { FaShareSquare } from "react-icons/fa";
 
+interface ExtendedLocation extends Location {
+  arrivalTime?: string;
+  departureTime?: string;
+  wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
+}
+
 interface DaySchedule {
   dayId: string;
   date: Date;
-  locations: (Location & {
-    arrivalTime?: string;
-    departureTime?: string;
-    wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
-  })[];
+  locations: ExtendedLocation[];
 }
 
 const pulseAnimation = `
@@ -85,12 +87,13 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
               lat: number;
               lng: number;
               photoUrl?: string;
+              placeId?: string;
               arrivalTime?: string;
               departureTime?: string;
+              wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
               type: string;
               createdAt: string;
               updatedAt: string;
-              wayToCommute?: "DRIVING" | "WALKING" | "TRANSIT";
             }[];
           }[];
         };
@@ -107,7 +110,8 @@ const SchedulePage = forwardRef(({ trip }: { trip: Trip }, ref) => {
               lat: loc.lat,
               lng: loc.lng,
               photoUrl: loc.photoUrl || null,
-              listId: trip.id, // Using trip ID as listId since we don't need the original
+              placeId: loc.placeId || null,
+              listId: trip.id,
               createdAt: new Date(loc.createdAt),
               updatedAt: new Date(loc.updatedAt),
               arrivalTime: loc.arrivalTime,
